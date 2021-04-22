@@ -1,0 +1,99 @@
+<html>
+<head>
+   <script src="bibliotecas/visjs/vis-network.min.js"></script>
+  <script src="bibliotecas/visjs/vis-timeline-graph2d.min.js"></script>
+  <link href="bibliotecas/visjs/vis-timeline-graph2d.min.css">
+</head>
+<body>
+<input type="file" id="file-input" />
+<h3>Processos de Trabalho RFB</h3>
+<div id="divGrafoPT"></div>
+<script>
+
+  let estilo = {
+    0:{
+      forma: "triangle",
+      cor: "#e76f51"
+    },
+    1:{
+      forma: "triangle",
+      cor: "#f4a261"
+    },
+    2:{
+      forma: "triangle",
+      cor: "#e9c46a"
+    },
+    3:{
+      forma: "triangle",
+      cor: "#2a9d8f"
+    },
+    3:{
+      forma: "triangle",
+      cor: "#264653"
+    }
+  };
+
+  let nos = [];
+  let ligacoes = [];
+
+  function processarJSON(jsonPT){
+    for (item in jsonPT){
+      criarItemGrafo(null, jsonPT[item], 0);
+    }
+    desenharGrafo();
+  }
+
+  function criarItemGrafo(pai, pt, nivel){
+    
+    console.log(`${Array(nivel).join(" ")}${pt.titulo}`);
+
+    nos.push({
+        id: pt.id,
+        label: pt.titulo,
+        shape: estilo[nivel].forma,
+        color: estilo[nivel].cor
+      });
+
+    if (pai !== null){
+      ligacoes.push({
+        from: pai.id,
+        to: pt.id
+      })
+    }
+
+    for (filho in pt.filhos){
+      criarItemGrafo(pt, pt.filhos[filho], nivel+1);
+    }
+  }
+
+  function desenharGrafo(){
+    let container = document.getElementById("divGrafoPT");
+    let data = {
+      nodes: new vis.DataSet(nos),
+      edges: new vis.DataSet(ligacoes)
+    }
+    let opcoes = {};
+    let network = new vis.Network(container, data, opcoes);
+  }
+
+</script>
+<script>
+
+
+function readSingleFile(e) {
+  var file = e.target.files[0];
+  if (!file) {
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {    
+    processarJSON(JSON.parse(e.target.result));
+  };
+  reader.readAsText(file);
+}
+
+document.getElementById('file-input')
+  .addEventListener('change', readSingleFile, false);
+</script>
+</body>
+</html>
