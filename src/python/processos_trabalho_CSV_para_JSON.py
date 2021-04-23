@@ -13,11 +13,10 @@ json_pt = {
     "competencias": {}
 }
 
-def criarNo(id, titulo, descricao):
+def criarNo(id, titulo):
     return {
         "id": id,
         "titulo": titulo,
-        "descricao": descricao,
         "filhos": {}
     }
 
@@ -28,17 +27,17 @@ for indice, linha in dsAtivos.iterrows():
     competencias = json_pt["competencias"]
 
     if not linha["idMacroprocesso"] in processos_trabalho:
-        processos_trabalho[linha["idMacroprocesso"]] = criarNo(linha["idMacroprocesso"], linha["titMacroprocesso"], linha["dsMacroprocesso"])
+        processos_trabalho[linha["idMacroprocesso"]] = criarNo(linha["idMacroprocesso"], linha["titMacroprocesso"])
     macroProcesso = processos_trabalho[linha["idMacroprocesso"]]
 
     if linha["idProcesso"] != linha["idMacroprocesso"]:
         if not linha["idProcesso"] in macroProcesso["filhos"]:
-            macroProcesso["filhos"][linha["idProcesso"]] = criarNo(linha["idProcesso"], linha["titProcesso"], linha["dsProcesso"])
+            macroProcesso["filhos"][linha["idProcesso"]] = criarNo(linha["idProcesso"], linha["titProcesso"])
         processo = macroProcesso["filhos"][linha["idProcesso"]]
 
         if linha["idSubProcesso"] != linha["idProcesso"]:
             if not linha["idSubProcesso"] in processo["filhos"]:
-                processo["filhos"][linha["idSubProcesso"]] = criarNo(linha["idSubProcesso"], linha["titSubProcesso"], linha["dsSubProcesso"])
+                processo["filhos"][linha["idSubProcesso"]] = criarNo(linha["idSubProcesso"], linha["titSubProcesso"])
                 processo["filhos"][linha["idSubProcesso"]]["competencias"] = []
 
             subprocesso = processo["filhos"][linha["idSubProcesso"]]
@@ -51,8 +50,8 @@ for indice, linha in dsAtivos.iterrows():
 
                 competencia = {
                     "id": idCompetencia,
-                    "titulo": linha["dsCompetencia"],
-                    "descricao": linha["titCompetencia"],
+                    "descricao": linha["dsCompetencia"],
+                    "titulo": linha["titCompetencia"],
                     "tipo":  linha["tipoCompetencia"]
                 }
                 competencias[idCompetencia] = competencia

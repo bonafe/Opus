@@ -11,9 +11,14 @@ class TabelaProcessosTrabalho{
         let lista = Object.values(dados.processos_trabalho);
         lista.map(function transformar(pt){
             pt.filhos = Object.values(pt.filhos);
-            pt.filhos.map(ptFilho => transformar(ptFilho));
+            pt.filhos.map(transformar, this);
+            if (pt.competencias !== undefined){
+                pt.competencias.forEach(idCompetencia =>{
+                    pt.filhos.push(this.dados.competencias[idCompetencia]);
+                });
+            }
             return pt;
-        });
+        },this);        
         return lista;
     }
 
@@ -21,13 +26,11 @@ class TabelaProcessosTrabalho{
         this.tabela = new Tabulator("#divTabelaPT", {
             dataTree:true,
             dataTreeChildField:"filhos",
-            height:205,
+            height:700,
             data:this.processosTrabalho,
             layout:"fitColumns",
-            columns:[
-                {title:"id", field:"id"},
-                {title:"titulo", field:"titulo"},
-                {title:"descricao", field:"descricao"}
+            columns:[                
+                {title:"Processos de Trabalho", field:"titulo"}                
             ]
         });
     }
