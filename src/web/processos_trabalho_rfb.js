@@ -1,4 +1,4 @@
-{
+let processos_trabalho_competencias = {
   "processos_trabalho": {
     "990000": {
       "id": 990000,
@@ -16571,4 +16571,4 @@
       "tipo": "Administrativa"
     }
   }
-}
+};
