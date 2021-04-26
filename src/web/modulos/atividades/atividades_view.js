@@ -57,7 +57,12 @@ export class AtividadesView extends HTMLElement{
 
         let options = {
             start: dozeHoraAtras,
-            end: daquiAMeiaHora
+            end: daquiAMeiaHora,
+            editable: true,
+            onMove: (item, callback) => {
+                console.log (`Atualizou item linha do tempo: ${item}`);
+                AtividadesDAO.getInstance().atualizarDuracaoAtividade(item.id, item.start, item.end);
+            }
         };
 
         this.timeline = new vis.Timeline(container, this.dataSetTimeLine, options);
@@ -69,7 +74,8 @@ export class AtividadesView extends HTMLElement{
             id: atividade.id,
             start: atividade.inicio,
             end: atividade.fim,
-            content: atividade.competencia.titulo
+            content: atividade.competencia.titulo,
+            type: "range"
         };
     }
 

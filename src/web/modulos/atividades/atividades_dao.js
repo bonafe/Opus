@@ -42,12 +42,32 @@ export class AtividadesDAO{
     }
 
 
-
-    salvarAtividadeUsuario(atividade){
-
+    salvarBase(){
         console.log (`Salvando competencia do usuário na base de dados local do navegador`);
-        this.atividadesUsuario[atividade.id] = atividade;
         localStorage.atividadesUsuario = JSON.stringify(this.atividadesUsuario);
     }
 
+
+
+    salvarAtividadeUsuario(atividade){
+
+        console.log (`Atualizando atividade do usuário`);
+        this.atividadesUsuario[atividade.id] = atividade;
+        this.salvarBase();
+    }
+
+
+
+    atualizarDuracaoAtividade(id, inicio, fim){
+
+        console.log (`Atualizando atividade do usuário`);
+
+        let atividade = this.atividadesUsuario[id];
+        atividade.inicio = inicio;
+        atividade.fim = fim;
+
+        this.atividadesUsuario[id] = atividade;
+
+
+    }
 }

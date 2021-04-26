@@ -123,7 +123,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
                     },
                     editable: celula => (celula.getRow().getData().filhos === undefined)
                 },
-                {title:"Favorito", field:"favorito", width:90, hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true, headerFilter:true,
+                {title:"Ativado", field:"favorito", width:90, hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true, headerFilter:true,
                     cellEdited: celula => {
                         console.log(`Favorito: ${celula.getValue()}`)
                     },
@@ -133,7 +133,6 @@ export class ProcessosTrabalhoView extends HTMLElement{
             rowDblClick: (evento, linha) => {
                 console.log(`Duplo clique na linha: ${linha.getData().titulo}`);
                 this.dispatchEvent (new CustomEvent(ProcessosTrabalhoView.EVENTO_CRIAR_ATIVIDADE, {detail:linha.getData()}));
-                
             },
             cellEdited: celula => {                
 
