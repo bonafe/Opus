@@ -1,26 +1,67 @@
-<html>
+<!DOCTYPE html>
+<html lang="pt">
 <head>
-    <script src="processos_trabalho_rfb.js"></script>
-    <script src="tabela_pt.js"></script>
-    <script src="grafo_pt.js"></script>
+    <meta charset="UTF-8">
+    <title>Trabalho RFB</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    
+    <!-- TODO: colocar tudo em um arquivo só para distribuição -->
+    <!-- Bootstrap TODO: Puxar local-->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
+    <!-- Vis.js: Grafo e linha do tempo -->
     <script src="bibliotecas/visjs/vis-network.min.js"></script>
     <script src="bibliotecas/visjs/vis-timeline-graph2d.min.js"></script>
     <link href="bibliotecas/visjs/vis-timeline-graph2d.min.css">
 
+    <!-- Tabulator: Tabelas -->
     <link href="bibliotecas/tabulator/css/tabulator.min.css" rel="stylesheet">
     <script type="text/javascript" src="bibliotecas/tabulator/js/tabulator.min.js"></script>
 
-    <script>
-        function carregou(){
-            let tabelaPT = new TabelaProcessosTrabalho(processos_trabalho_competencias);
-            //criarGrafo(processos_trabalho_competencias);
+    <!-- Humanize Duration: Tempo em formato humano de leitura -->
+    <script type="text/javascript" src="./bibliotecas/humanize-duration.js"></script>
+    <!-- Elementos da Tela -->
+    <script type="module">        
+        import { ProcessosTrabalhoView } from "./modulos/processos_trabalho/processos_trabalho_view.js";
+        import { AtividadesView } from "./modulos/atividades/atividades_view.js";
+        
+        window.limpar = () => {
+            delete localStorage.atividadesUsuario;
+            delete localStorage.processosTrabalho;
+            delete localStorage.competencias; 
+            delete localStorage.competenciasUsuario;
+        }
+
+        window.onload = () => {
+            window.atividades = document.querySelector("atividades-view");
+            window.atividades.renderizar();
+
+            window.processosTrabalho = document.querySelector('processos-trabalho-view');
+            window.processosTrabalho.addEventListener (ProcessosTrabalhoView.EVENTO_CRIAR_ATIVIDADE, evento => {
+                let competencia = evento.detail;
+                window.atividades.adicionarAtividade(competencia);
+            });
+            window.processosTrabalho.renderizar();
         }
     </script>
 </head>
-<body onload="carregou()">
-<h3>Processos de Trabalho RFB</h3>
-<div id="divTabelaPT"></div>
-<!--div id="divGrafoPT"></div-->
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-12">
+            <h3>Processos de Trabalho RFB</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <processos-trabalho-view></processos-trabalho-view>        
+        </div>
+        <div class="col-sm">
+            <atividades-view></atividades-view>            
+        </div>
+    </div>    
+</div>
 </body>
 </html>
