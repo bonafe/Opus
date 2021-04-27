@@ -3,7 +3,7 @@ import { ProcessosTrabalhoDAO } from './processos_trabalho_dao.js';
 
 export class ProcessosTrabalhoView extends HTMLElement{
 
-    static EVENTO_CRIAR_ATIVIDADE = "criarAtividade";
+    
     
     static _template = undefined;
 
@@ -46,6 +46,9 @@ export class ProcessosTrabalhoView extends HTMLElement{
         this.inicializarFiltros();        
     }
 
+    redimensionar(largura, altura){
+        this.tabela.setHeight(altura);
+    }
 
 
     carregarConfiguracoes(){
@@ -101,7 +104,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
         this.tabela = new Tabulator(container, {
             dataTree:true,
             dataTreeChildField:"filhos",
-            //height:350,            
+            height:350,            
             layout:"fitColumns",
             columns:[                
                 {title:"Processos de Trabalho", field:"titulo", width:450, headerFilter:true},
@@ -132,7 +135,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
             ],
             rowDblClick: (evento, linha) => {
                 console.log(`Duplo clique na linha: ${linha.getData().titulo}`);
-                this.dispatchEvent (new CustomEvent(ProcessosTrabalhoView.EVENTO_CRIAR_ATIVIDADE, {detail:linha.getData()}));
+                //TODO: exibir detalhes                
             },
             cellEdited: celula => {                
 

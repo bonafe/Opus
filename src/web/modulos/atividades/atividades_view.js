@@ -3,6 +3,8 @@ import { AtividadesDAO } from './atividades_dao.js';
 export class AtividadesView extends HTMLElement{
 
 
+    static EVENTO_CRIAR_ATIVIDADE = "criarAtividade";
+
 
     static _template = undefined;
 

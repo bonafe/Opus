@@ -26,7 +26,8 @@
     <script type="module">        
         import { ProcessosTrabalhoView } from "./modulos/processos_trabalho/processos_trabalho_view.js";
         import { AtividadesView } from "./modulos/atividades/atividades_view.js";
-        
+        import { CompetenciasView } from "./modulos/processos_trabalho/competencias_view.js";
+
         window.limpar = () => {
             delete localStorage.atividadesUsuario;
             delete localStorage.processosTrabalho;
@@ -38,30 +39,59 @@
             window.atividades = document.querySelector("atividades-view");
             window.atividades.renderizar();
 
-            window.processosTrabalho = document.querySelector('processos-trabalho-view');
-            window.processosTrabalho.addEventListener (ProcessosTrabalhoView.EVENTO_CRIAR_ATIVIDADE, evento => {
+            window.processosTrabalho = document.querySelector('processos-trabalho-view');            
+            window.processosTrabalho.renderizar();
+
+            window.competencias = document.querySelector('competencias-view');
+            window.competencias.addEventListener (AtividadesView.EVENTO_CRIAR_ATIVIDADE, evento => {
                 let competencia = evento.detail;
+                console.log ("adicionarAtividade");
                 window.atividades.adicionarAtividade(competencia);
             });
-            window.processosTrabalho.renderizar();
-        }
+            window.competencias.renderizar();
+            window.atualizarDimensoes();
+        };
+
+        window.onresize = () => {
+            window.atualizarDimensoes();
+        };
+
+        window.atualizarDimensoes = () => {                             
+            //window.atividades.style.height = `200px`;
+            //window.competencias.style.height = `150px`;
+            //window.processosTrabalho.redimensionar(screen.availWidth, screen.availHeight - 500);
+        };
     </script>
 </head>
-<body>
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-xs-12">
-            <h3>Processos de Trabalho RFB</h3>
+<body>    
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Trabalho RFB</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Atividades</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Jornada</a>
+            </li>   
+          </ul>
         </div>
+      </nav>   
+    <div class="row">
+        <section class="col-sm-7">
+            <!--TODO: atualizar altura da tabela com resize dos componentes-->
+            <processos-trabalho-view></processos-trabalho-view>                    
+        </section>    
+        <!--TODO: centralizar verticalmente-->
+        <section class="col-sm-5  text-center justify-content-center">
+            <competencias-view></competencias-view>
+        </section> 
     </div>
-    <div class="row">
-        <div class="col-sm">
-            <processos-trabalho-view></processos-trabalho-view>        
-        </div>
-        <div class="col-sm">
-            <atividades-view></atividades-view>            
-        </div>
-    </div>    
-</div>
+    <footer>
+        <atividades-view></atividades-view>
+    </footer>
 </body>
 </html>
