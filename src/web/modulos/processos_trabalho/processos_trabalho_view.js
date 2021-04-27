@@ -3,6 +3,8 @@ import { ProcessosTrabalhoDAO } from './processos_trabalho_dao.js';
 
 export class ProcessosTrabalhoView extends HTMLElement{
 
+
+    static EVENTO_EDITOU_PROCESSO_TRABALHO_USUARIO = "editouProcessoTrabalhoUsuario";
     
     
     static _template = undefined;
@@ -20,10 +22,10 @@ export class ProcessosTrabalhoView extends HTMLElement{
                         <input type="radio" name="filtro" value="todos">Todos
                         </label>
                         <label class="checkbox-inline">
-                        <input type="radio" name="filtro" value="favoritos">Favoritos
+                        <input type="radio" name="filtro" value="ativas">Ativas
                         </label>
                         <label class="checkbox-inline">
-                        <input type="radio" name="filtro" value="preenchidos">Preenchidos
+                        <input type="radio" name="filtro" value="preenchidos">Preenchidas
                         </label>
                     </form>
                     <div class="container-flex">
@@ -57,7 +59,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
             console.log (`Configurações não encontradas na base de dados local`);
             console.log (`Inicializando configuração com valores padrão`);
             this.configuracoes = {
-                filtro: "favoritos"
+                filtro: "ativas"
             };
             this.salvarConfiguracoes();
 
@@ -126,9 +128,9 @@ export class ProcessosTrabalhoView extends HTMLElement{
                     },
                     editable: celula => (celula.getRow().getData().filhos === undefined)
                 },
-                {title:"Ativado", field:"favorito", width:90, hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true, headerFilter:true,
+                {title:"Ativa", field:"ativa", width:90, hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true, headerFilter:true,
                     cellEdited: celula => {
-                        console.log(`Favorito: ${celula.getValue()}`)
+                        console.log(`Ativa: ${celula.getValue()}`)
                     },
                     editable: celula => (celula.getRow().getData().filhos === undefined)
                 }
@@ -137,9 +139,10 @@ export class ProcessosTrabalhoView extends HTMLElement{
                 console.log(`Duplo clique na linha: ${linha.getData().titulo}`);
                 //TODO: exibir detalhes                
             },
-            cellEdited: celula => {                
-
-                ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(celula.getRow().getData());
+            cellEdited: celula => {
+                let competenciaUsuario = celula.getRow().getData();
+                ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(competenciaUsuario);
+                this.dispatchEvent (new CustomEvent(ProcessosTrabalhoView.EVENTO_EDITOU_PROCESSO_TRABALHO_USUARIO, {detail:competenciaUsuario}));
             }
         });
 
@@ -148,10 +151,10 @@ export class ProcessosTrabalhoView extends HTMLElement{
 
 
 
-    verificaFavorito (processoTrabalho){
+    verificaAtiva (processoTrabalho){
         
-        //Caso a varíavel favorita exista, retorna seu valor, senão retorna falso
-        return (processoTrabalho.favorito !== undefined ? processoTrabalho.favorito : false);
+        //Caso a varíavel ativa exista, retorna seu valor, senão retorna falso
+        return (processoTrabalho.ativa !== undefined ? processoTrabalho.ativa : false);
     }
 
 
@@ -161,7 +164,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
         let possuiConteudo = 
             (processoTrabalho.nivelProficiencia !== undefined) ||
             (processoTrabalho.nivelAfinidade !== undefined) ||
-            this.verificaFavorito(processoTrabalho);            
+            this.verificaAtiva(processoTrabalho);
 
         return possuiConteudo;
     }
@@ -241,7 +244,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
     filtrarProcessosTrabalho(){
                 
         let dicionarioDeFiltrosEFuncoes = {
-            "favoritos": this.verificaFavorito,
+            "ativas": this.verificaAtiva,
             "preenchidos": this.verificaSePossuiConteudo.bind(this),
             "todos": processoTrabalho => true
         };

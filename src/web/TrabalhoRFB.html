@@ -39,14 +39,19 @@
             window.atividades = document.querySelector("atividades-view");
             window.atividades.renderizar();
 
-            window.processosTrabalho = document.querySelector('processos-trabalho-view');            
+            window.processosTrabalho = document.querySelector('processos-trabalho-view');
+            window.processosTrabalho.addEventListener (ProcessosTrabalhoView.EVENTO_EDITOU_PROCESSO_TRABALHO_USUARIO, evento => {
+                let competencia = evento.detail;
+                console.log ("atualizou competência usuário");
+                window.competencias.renderizar();
+            });
             window.processosTrabalho.renderizar();
 
             window.competencias = document.querySelector('competencias-view');
             window.competencias.addEventListener (AtividadesView.EVENTO_CRIAR_ATIVIDADE, evento => {
                 let competencia = evento.detail;
                 console.log ("adicionarAtividade");
-                window.atividades.adicionarAtividade(competencia);
+                window.atividades.adicionarAtividadeDepoisDaMaisRecente(competencia);
             });
             window.competencias.renderizar();
             window.atualizarDimensoes();

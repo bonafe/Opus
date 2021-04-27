@@ -61,9 +61,15 @@ export class AtividadesView extends HTMLElement{
             start: dozeHoraAtras,
             end: daquiAMeiaHora,
             editable: true,
-            onMove: (item, callback) => {
+            multiselect: true,
+            onMove: item => {
                 console.log (`Atualizou item linha do tempo: ${item}`);
                 AtividadesDAO.getInstance().atualizarDuracaoAtividade(item.id, item.start, item.end);
+            },
+            onRemove: item => {
+                console.log (`Removeu item linha do tempo: ${item}`);
+                AtividadesDAO.getInstance().removerAtividade(item.id);
+                this.dataSetTimeLine.remove(item.id);
             }
         };
 
@@ -82,17 +88,39 @@ export class AtividadesView extends HTMLElement{
     }
 
 
-    adicionarAtividade (competencia){
+
+    adicionarAtividadeDepoisDaMaisRecente(competencia){
+
+        let dataFimItemMaisRecente = 0;
+
+        this.dataSetTimeLine.forEach(item => {
+            if (item.end > dataFimItemMaisRecente){
+                dataFimItemMaisRecente = item.end;
+            }
+        });
+
+        let duracaoPadrao = 45 * 60 * 1000;
+
+        //Se não existrem items
+        if (dataFimItemMaisRecente == 0){
+            dataFimItemMaisRecente = (new Date()).getTime() - duracaoPadrao;
+        }
+
+        this.adicionarAtividade(competencia, dataFimItemMaisRecente, dataFimItemMaisRecente + duracaoPadrao);
+    }
+
+
+
+    adicionarAtividade (competencia, inicio, fim){
 
         let agora = new Date();
-        let meiaHoraAtras = agora.valueOf() - 1000 * 60 * 30; //30 minutos = 1000 * 60 * 30 milissegundos
-        let daquiAUmMinuto = agora.valueOf() + 1000 * 60; //1 minuto = 1000 * 60 milissegundos
 
         let atividade = {
             id:`${agora.getTime()}_${competencia.id}`,
-            inicio:meiaHoraAtras,
-            fim:daquiAUmMinuto,
-            competencia:competencia
+            inicio:inicio,
+            fim:fim,
+            competencia:competencia,
+            dataCriacao: agora.toISOString
         }
         AtividadesDAO.getInstance().salvarAtividadeUsuario(atividade);
         

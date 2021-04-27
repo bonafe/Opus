@@ -67,7 +67,13 @@ export class AtividadesDAO{
         atividade.fim = fim;
 
         this.atividadesUsuario[id] = atividade;
+        this.salvarBase();
+    }
 
 
+
+    removerAtividade(id){
+        delete this.atividadesUsuario[id];
+        this.salvarBase();
     }
 }

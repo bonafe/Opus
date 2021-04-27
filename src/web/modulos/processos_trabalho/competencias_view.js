@@ -43,20 +43,30 @@ export class CompetenciasView extends HTMLElement{
 
     desenharBotoesCompetencias(){
         let container = this._shadowRoot.querySelector("div");
+
+        //Limpa todos os botões
+        while (container.firstChild) {
+            container.removeChild(container.lastChild);
+        }
+
+        //Cria os botões baseados nas competências ativas
         this.competenciasUsuario = JSON.parse(JSON.stringify(ProcessosTrabalhoDAO.getInstance().competenciasUsuario));
-        Object.values(this.competenciasUsuario).forEach( competencia => {
-            let botao = document.createElement("button");
-            botao.type = "button";
-            botao.classList.add("btn");
-            botao.classList.add("btn-primary");            
-            botao.classList.add("m-1");
-            botao.textContent = competencia.titulo;
-            botao.style.width = '240px';
-            botao.addEventListener("click", ()=>{
-                this.dispatchEvent (new CustomEvent(AtividadesView.EVENTO_CRIAR_ATIVIDADE, {detail:competencia}));
+
+        Object.values(this.competenciasUsuario)
+            .filter(competencia => competencia.ativa)
+            .forEach( competencia => {
+                let botao = document.createElement("button");
+                botao.type = "button";
+                botao.classList.add("btn");
+                botao.classList.add("btn-primary");
+                botao.classList.add("m-1");
+                botao.textContent = competencia.titulo;
+                botao.style.width = '240px';
+                botao.addEventListener("click", ()=>{
+                    this.dispatchEvent (new CustomEvent(AtividadesView.EVENTO_CRIAR_ATIVIDADE, {detail:competencia}));
+                });
+                container.appendChild(botao);
             });
-            container.appendChild(botao);
-        });
     }
 }
 customElements.define('competencias-view', CompetenciasView);
