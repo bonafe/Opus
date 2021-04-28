@@ -22,8 +22,23 @@
 
     <!-- Humanize Duration: Tempo em formato humano de leitura -->
     <script type="text/javascript" src="./bibliotecas/humanize-duration.js"></script>
+
+    <!-- jsPanel: Janelas flutuantes-->
+    <link rel="stylesheet" href="./bibliotecas/jspanel/jspanel.min.css">
+
     <!-- Elementos da Tela -->
     <script type="module">        
+
+        //jsPanel: Janelas flutuantes
+        import { jsPanel } from './bibliotecas/jspanel/jspanel.min.js';        
+        import './bibliotecas/jspanel/extensions/hint/jspanel.hint.min.js';
+        import './bibliotecas/jspanel/extensions/modal/jspanel.modal.min.js';
+        import './bibliotecas/jspanel/extensions/contextmenu/jspanel.contextmenu.min.js';
+        import './bibliotecas/jspanel/extensions/tooltip/jspanel.tooltip.min.js';
+        import './bibliotecas/jspanel/extensions/layout/jspanel.layout.min.js';
+        import './bibliotecas/jspanel/extensions/dock/jspanel.dock.min.js';
+
+        //Módulos locais
         import { ProcessosTrabalhoView } from "./modulos/processos_trabalho/processos_trabalho_view.js";
         import { AtividadesView } from "./modulos/atividades/atividades_view.js";
         import { CompetenciasView } from "./modulos/processos_trabalho/competencias_view.js";
@@ -36,10 +51,13 @@
         }
 
         window.onload = () => {
-            window.atividades = document.querySelector("atividades-view");
+
+            window.atividades = document.createElement("atividades-view");
+            window.criarPainel("Atividades", window.atividades);
             window.atividades.renderizar();
 
-            window.processosTrabalho = document.querySelector('processos-trabalho-view');
+            window.processosTrabalho = document.createElement('processos-trabalho-view');
+            window.criarPainel("Processos de Trabalho", window.processosTrabalho);
             window.processosTrabalho.addEventListener (ProcessosTrabalhoView.EVENTO_EDITOU_PROCESSO_TRABALHO_USUARIO, evento => {
                 let competencia = evento.detail;
                 console.log ("atualizou competência usuário");
@@ -47,7 +65,8 @@
             });
             window.processosTrabalho.renderizar();
 
-            window.competencias = document.querySelector('competencias-view');
+            window.competencias = document.createElement('competencias-view');
+            window.criarPainel("Conteúdo", window.competencias);
             window.competencias.addEventListener (AtividadesView.EVENTO_CRIAR_ATIVIDADE, evento => {
                 let competencia = evento.detail;
                 console.log ("adicionarAtividade");
@@ -66,37 +85,64 @@
             //window.competencias.style.height = `150px`;
             //window.processosTrabalho.redimensionar(screen.availWidth, screen.availHeight - 500);
         };
+
+        window.criarPainel = (titulo, conteudo) => {
+
+            jsPanel.create({
+                theme: 'dark',
+                headerLogo: '<i class="fad fa-home-heart ml-2"></i>',
+                headerTitle: `${titulo}`,
+                //headerToolbar: '<span class="text-sm">Just some text in optional header toolbar ...</span>',
+                //footerToolbar: '<span class="flex flex-grow">You can have a footer toolbar too</span>'+
+                //            '<i class="fal fa-clock mr-2"></i><span class="clock">loading ...</span>',
+                panelSize: {
+                    width: () => { return Math.min(800, window.innerWidth*0.9);},
+                    height: () => { return Math.min(500, window.innerHeight*0.6);}
+                },
+                animateIn: 'jsPanelFadeIn',
+                //contentAjax: {
+                //    url: 'http://localhost',
+                //    done: (xhr, panel) => {
+                //        panel.content.innerHTML = xhr.responseText;
+                //        Prism.highlightAll();
+                //    }
+                //},
+                onwindowresize: true,
+                callback: function(panel) {
+                    function clock() {
+                        let time = new Date(),
+                            hours = time.getHours(),
+                            minutes = time.getMinutes(),
+                            seconds = time.getSeconds();
+                        panel.footer.querySelectorAll('.clock')[0].innerHTML = `${harold(hours)}:${harold(minutes)}:${harold(seconds)}`;
+                        function harold(standIn) {
+                            if (standIn < 10) {standIn = '0' + standIn;}
+                            return standIn;
+                        }
+                    }
+                    setInterval(clock, 1000);
+                },
+                content: conteudo
+            });
+        }
     </script>
 </head>
 <body>    
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">Trabalho RFB</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
+            <ul class="navbar-nav">
             <li class="nav-item active">
-              <a class="nav-link" href="#">Atividades</a>
+                <a class="nav-link" href="#">Atividades</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Jornada</a>
+                <a class="nav-link" href="#">Jornada</a>
             </li>   
-          </ul>
+            </ul>
         </div>
-      </nav>   
-    <div class="row">
-        <section class="col-sm-7">
-            <!--TODO: atualizar altura da tabela com resize dos componentes-->
-            <processos-trabalho-view></processos-trabalho-view>                    
-        </section>    
-        <!--TODO: centralizar verticalmente-->
-        <section class="col-sm-5  text-center justify-content-center">
-            <competencias-view></competencias-view>
-        </section> 
-    </div>
-    <footer>
-        <atividades-view></atividades-view>
-    </footer>
+    </nav>      
 </body>
 </html>

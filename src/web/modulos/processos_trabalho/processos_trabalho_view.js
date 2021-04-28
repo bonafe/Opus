@@ -137,13 +137,30 @@ export class ProcessosTrabalhoView extends HTMLElement{
             ],
             rowDblClick: (evento, linha) => {
                 console.log(`Duplo clique na linha: ${linha.getData().titulo}`);
-                //TODO: exibir detalhes                
+                let competenciaUsuario = linha.getData();
+                linha.treeToggle();
+                if (competenciaUsuario.filhos === undefined){
+                    competenciaUsuario.ativa = (competenciaUsuario.ativa === undefined ? true : !competenciaUsuario.ativa);                
+                    ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(competenciaUsuario);
+                    this.tabela.updateData([{id:competenciaUsuario.id, ativa:competenciaUsuario.ativa}])
+                        .then(()=>{
+                            console.log("deu certo");
+                        })
+                        .catch(()=>{
+                            console.log("deu erro");
+                        });
+                    this.dispatchEvent (new CustomEvent(ProcessosTrabalhoView.EVENTO_EDITOU_PROCESSO_TRABALHO_USUARIO, {detail:competenciaUsuario}));
+                }else{
+                    if (competenciaUsuario.filhos[0].filhos === undefined){
+                        console.log ("Adicionar competência");
+                    }
+                }
             },
             cellEdited: celula => {
                 let competenciaUsuario = celula.getRow().getData();
                 ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(competenciaUsuario);
                 this.dispatchEvent (new CustomEvent(ProcessosTrabalhoView.EVENTO_EDITOU_PROCESSO_TRABALHO_USUARIO, {detail:competenciaUsuario}));
-            }
+            }            
         });
 
         this.filtrarProcessosTrabalho();
