@@ -128,7 +128,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
                     },
                     editable: celula => (celula.getRow().getData().filhos === undefined)
                 },
-                {title:"Ativa", field:"ativa", width:90, hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true, headerFilter:true,
+                {title:"Minhas Competências", field:"ativa", width:120, hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true, headerFilter:true,
                     cellEdited: celula => {
                         console.log(`Ativa: ${celula.getValue()}`)
                     },
@@ -150,17 +150,31 @@ export class ProcessosTrabalhoView extends HTMLElement{
                             console.log("deu erro");
                         });
                     this.dispatchEvent (new CustomEvent(ProcessosTrabalhoView.EVENTO_EDITOU_PROCESSO_TRABALHO_USUARIO, {detail:competenciaUsuario}));
-                }else{
-                    if (competenciaUsuario.filhos[0].filhos === undefined){
-                        console.log ("Adicionar competência");
-                    }
                 }
             },
             cellEdited: celula => {
                 let competenciaUsuario = celula.getRow().getData();
                 ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(competenciaUsuario);
                 this.dispatchEvent (new CustomEvent(ProcessosTrabalhoView.EVENTO_EDITOU_PROCESSO_TRABALHO_USUARIO, {detail:competenciaUsuario}));
-            }            
+            },
+             rowContextMenu: (componente, e) => {
+
+                    let processoTrabalho = componente.getData();
+                    if (processoTrabalho.filhos === undefined){
+                        return false;
+                    }else if (processoTrabalho.filhos.length == 0){
+                        return false;
+                    }else if (processoTrabalho.filhos[0].filhos === undefined){
+                        let menu = [];
+                        menu.push({
+                            label:"Adicionar",
+                            action:function(e, linha){
+                                console.log (`Digitou competência: ${prompt("Digite a competência:")}`)
+                            }
+                        });
+                        return menu;
+                    }
+                }
         });
 
         this.filtrarProcessosTrabalho();
@@ -267,10 +281,11 @@ export class ProcessosTrabalhoView extends HTMLElement{
         };
                 
         //Cria uma copia da lista completa pois as funções a seguir modificação seu conteudo
-        let processosTrabalho = this.transformarBaseProcessosTrabalho();
+        this.processosTrabalho = this.transformarBaseProcessosTrabalho();
+        this.processosTrabalho = this.processosTrabalho.filter(this.criarFuncaoDeFiltro(dicionarioDeFiltrosEFuncoes[this.configuracoes.filtro]), this);
 
         //Filtra os elementos baseado na função de condição escolhida
-        this.tabela.setData(processosTrabalho.filter(this.criarFuncaoDeFiltro(dicionarioDeFiltrosEFuncoes[this.configuracoes.filtro]), this));        
+        this.tabela.setData(this.processosTrabalho);
             
         //Problemas de performance se abrir todos os processos de trabalho
         if (this.configuracoes.filtro != "todos"){
