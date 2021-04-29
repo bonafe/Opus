@@ -74,6 +74,17 @@ export class AtividadesView extends HTMLElement{
         };
 
         this.timeline = new vis.Timeline(container, this.dataSetTimeLine, options);
+
+        this.timeline.on('rangechange', properties => {
+            console.dir(properties);
+            console.log('rangechange');
+        });
+    
+        this.timeline.on('rangechanged', properties => {
+            console.dir(this.timeline);
+            console.dir(properties);
+            console.log('rangechanged');
+        });
     }
 
 
