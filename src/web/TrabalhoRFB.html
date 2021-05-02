@@ -28,7 +28,11 @@
 
     <!-- Elementos da Tela -->
     <script type="module">        
-        import './trabalho_rfb.js';
+        import { TrabalhoRFB } from './trabalho_rfb.js';
+        window.onload = () => {
+            window.trabalhoRFB = TrabalhoRFB.getInstance();
+            window.trabalhoRFB.renderizar();
+        }
     </script>
 </head>
 <body>    
@@ -39,12 +43,15 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-            <li class="nav-item active">
-                <a class="nav-link" href="#">Atividades</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Jornada</a>
-            </li>   
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Processos de Trabalho</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Tarefas</a>
+                </li>
+                 <li class="nav-item">
+                    <a class="nav-link" href="#">Atividades</a>
+                </li>
             </ul>
         </div>
     </nav>      

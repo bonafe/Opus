@@ -1,3 +1,7 @@
+import { UsuarioDAO } from '../pessoas/usuario_dao.js';
+
+
+
 export class AtividadesDAO{
 
 
@@ -22,6 +26,9 @@ export class AtividadesDAO{
 
 
     carregarBase(){
+
+        let cpf = UsuarioDAO.getInstance().usuario.cpf;
+        this.idBaseAtividades = `atividades_${cpf}`;
 
         //A primeira vez que roda pega os dados do javascript, depois usa o localStorage para guardas as mudanças
         if (!localStorage.atividadesUsuario){     

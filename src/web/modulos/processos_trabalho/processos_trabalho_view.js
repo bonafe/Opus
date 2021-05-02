@@ -1,5 +1,5 @@
 import { ProcessosTrabalhoDAO } from './processos_trabalho_dao.js';
-
+import { UsuarioDAO } from '../pessoas/usuario_dao.js';
 
 export class ProcessosTrabalhoView extends HTMLElement{
 
@@ -22,13 +22,18 @@ export class ProcessosTrabalhoView extends HTMLElement{
                         <input type="radio" name="filtro" value="todos">Todos
                         </label>
                         <label class="checkbox-inline">
-                        <input type="radio" name="filtro" value="ativas">Ativas
+                        <input type="radio" name="filtro" value="ativas">Minhas tarefas
                         </label>
                         <label class="checkbox-inline">
-                        <input type="radio" name="filtro" value="preenchidos">Preenchidas
+                        <input type="radio" name="filtro" value="preenchidos">Competências preenchidas
                         </label>
                     </form>
                     <div class="container-flex">
+                        <style>
+                            .tabulator-header{
+                                #text-align: center;
+                            }
+                        </style>
                         <div id="tabelaProcessosTrabalho"></div>
                     </div>                    
                 </div>
@@ -49,7 +54,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
     }
 
     redimensionar(largura, altura){
-        this.tabela.setHeight(altura);
+        this.tabela.setHeight(altura-80);
     }
 
 
@@ -110,25 +115,25 @@ export class ProcessosTrabalhoView extends HTMLElement{
             layout:"fitColumns",
             columns:[                
                 {title:"Processos de Trabalho", field:"titulo", width:450, headerFilter:true},
-                {title:"Nível de Proficiência", field:"nivelProficiencia", width:180, hozAlign:"center", formatter:"star", formatterParams:{stars:5}, editor:true, headerFilter:true,
+                {title:"Proficiência", field:"nivelProficiencia", width:180, hozAlign:"center", formatter:"star", formatterParams:{stars:5}, editor:true, headerFilter:true,
                     cellEdited: celula => {
                         console.log(`Nível de Proficiência: ${celula.getValue()}`)
                     },
                         editable: celula => (celula.getRow().getData().filhos === undefined)
                     },
-                {title:"Nível de Afinidade", field:"nivelAfinidade", width:160, hozAlign:"center", formatter:"star", formatterParams:{stars:5}, editor:true, headerFilter:true,
+                {title:"Afinidade", field:"nivelAfinidade", width:160, hozAlign:"center", formatter:"star", formatterParams:{stars:5}, editor:true, headerFilter:true,
                     cellEdited: celula => {
                         console.log(`Nível de Afinidade: ${celula.getValue()}`)
                     },
                     editable: celula => (celula.getRow().getData().filhos === undefined)
                 },
-                {title:"Duração Padrão", field:"duracaoMedia", width:145, hozAlign:"center", editor:"input", headerFilter:true,
+                {title:"Duração", field:"duracaoMedia", width:145, hozAlign:"center", editor:"input", headerFilter:true,
                     ccellEdited: celula => {
                         console.log(`Duração Padrão: ${celula.getValue()}`)
                     },
                     editable: celula => (celula.getRow().getData().filhos === undefined)
                 },
-                {title:"Minhas Competências", field:"ativa", width:120, hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true, headerFilter:true,
+                {title:"Tarefa", field:"ativa", width:120, hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true, headerFilter:true,
                     cellEdited: celula => {
                         console.log(`Ativa: ${celula.getValue()}`)
                     },
@@ -140,8 +145,11 @@ export class ProcessosTrabalhoView extends HTMLElement{
                 let competenciaUsuario = linha.getData();
                 linha.treeToggle();
                 if (competenciaUsuario.filhos === undefined){
+
+                    let processoTrabalho = linha.getTreeParent().getData();
                     competenciaUsuario.ativa = (competenciaUsuario.ativa === undefined ? true : !competenciaUsuario.ativa);                
-                    ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(competenciaUsuario);
+                    ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(processoTrabalho.id, competenciaUsuario);
+
                     this.tabela.updateData([{id:competenciaUsuario.id, ativa:competenciaUsuario.ativa}])
                         .then(()=>{
                             console.log("deu certo");
@@ -153,8 +161,9 @@ export class ProcessosTrabalhoView extends HTMLElement{
                 }
             },
             cellEdited: celula => {
+                let processoTrabalho = celula.getRow().getTreeParent().getData();
                 let competenciaUsuario = celula.getRow().getData();
-                ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(competenciaUsuario);
+                ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(processoTrabalho, competenciaUsuario);
                 this.dispatchEvent (new CustomEvent(ProcessosTrabalhoView.EVENTO_EDITOU_PROCESSO_TRABALHO_USUARIO, {detail:competenciaUsuario}));
             },
              rowContextMenu: (componente, e) => {
@@ -168,8 +177,11 @@ export class ProcessosTrabalhoView extends HTMLElement{
                         let menu = [];
                         menu.push({
                             label:"Adicionar",
-                            action:function(e, linha){
-                                console.log (`Digitou competência: ${prompt("Digite a competência:")}`)
+                            action:(e, linha) => {
+                                linha.addTreeChild(
+                                    this.adicionarCompetenciaUsuario(
+                                        linha.getData(), //processo de trabalho
+                                        prompt("Digite o título da nova competência")));
                             }
                         });
                         return menu;
@@ -180,6 +192,19 @@ export class ProcessosTrabalhoView extends HTMLElement{
         this.filtrarProcessosTrabalho();
     }
 
+
+    adicionarCompetenciaUsuario (processoTrabalho, tituloCompetencia){
+
+        console.dir(processoTrabalho);
+
+        let competencia = {
+            id: `${(new Date).getTime()}_${UsuarioDAO.getInstance().usuario.cpf}`,
+            titulo: tituloCompetencia,
+            criadaPeloUsuario: true
+        };
+        ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(processoTrabalho.id, competencia);
+        return competencia;
+    }
 
 
     verificaAtiva (processoTrabalho){
