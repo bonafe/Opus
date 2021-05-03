@@ -147,5 +147,6 @@ export class TrabalhoRFB{
         delete localStorage.competencias;
         delete localStorage.competenciasUsuario;
         delete localStorage.configuracaoPaineis;
+        delete localStorage.configuracoes;
     }
 }

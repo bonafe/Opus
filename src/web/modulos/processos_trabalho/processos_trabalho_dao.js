@@ -32,7 +32,7 @@ export class ProcessosTrabalhoDAO{
         this.idBaseCompetencias = `competencias_${cpf}`;
 
         //A primeira vez que roda pega os dados do javascript, depois usa o localStorage para guardas as mudanças
-        if (!localStorage.processosTrabalho){     
+        if (!localStorage[this.idBaseProcessosTrabalho ]){
 
             console.log (`Base de dados não encontrada`);
             console.log (`Inicializando base de dados com a base: base_processos_trabalho_rfb_23_04_2021`);

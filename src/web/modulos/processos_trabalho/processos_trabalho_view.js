@@ -168,34 +168,44 @@ export class ProcessosTrabalhoView extends HTMLElement{
             },
              rowContextMenu: (componente, e) => {
 
-                    let processoTrabalho = componente.getData();
-                    if (processoTrabalho.filhos === undefined){
+                let menu = [];
+                let processoTrabalho = componente.getData();
+
+                if (processoTrabalho.filhos === undefined){
+                    if (!processoTrabalho.criadaPeloUsuario){
                         return false;
-                    }else if (processoTrabalho.filhos.length == 0){
-                        return false;
-                    }else if (processoTrabalho.filhos[0].filhos === undefined){
-                        let menu = [];
-                        menu.push({
-                            label:"Adicionar",
-                            action:(e, linha) => {
-                                linha.addTreeChild(
-                                    this.adicionarCompetenciaUsuario(
-                                        linha.getData(), //processo de trabalho
-                                        prompt("Digite o título da nova competência")));
+                    }else{
+                       menu.push({
+                        label:"Renomear",
+                        action:(e, linha) => {
+                            linha.addTreeChild(
+                                this.renomearCompetencia(
+                                    linha.getData().id,
+                                    prompt("Digite o novo título da competência")));
                             }
                         });
-                        return menu;
                     }
+                }else {
+
+                    menu.push({
+                        label:"Adicionar",
+                        action:(e, linha) => {
+                            linha.addTreeChild(
+                                this.adicionarCompetencia(
+                                    linha.getData(), //processo de trabalho
+                                    prompt("Digite o título da nova competência")));
+                        }
+                    });
                 }
+                return menu;
+             }
         });
 
         this.filtrarProcessosTrabalho();
     }
 
 
-    adicionarCompetenciaUsuario (processoTrabalho, tituloCompetencia){
-
-        console.dir(processoTrabalho);
+    adicionarCompetencia (processoTrabalho, tituloCompetencia){
 
         let competencia = {
             id: `${(new Date).getTime()}_${UsuarioDAO.getInstance().usuario.cpf}`,
@@ -205,6 +215,19 @@ export class ProcessosTrabalhoView extends HTMLElement{
         ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(processoTrabalho.id, competencia);
         return competencia;
     }
+
+
+    renomearCompetencia (idCompetencia, tituloCompetencia){
+
+        let competencia = {
+            id: idCompetencia,
+            titulo: tituloCompetencia,
+            criadaPeloUsuario: true
+        };
+        ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(processoTrabalho.id, competencia);
+        return competencia;
+    }
+
 
 
     verificaAtiva (processoTrabalho){
@@ -277,7 +300,6 @@ export class ProcessosTrabalhoView extends HTMLElement{
 
         let copiaProcessosTrabalho = JSON.parse(JSON.stringify(ProcessosTrabalhoDAO.getInstance().processosTrabalho));
         let copiaCompetencias = JSON.parse(JSON.stringify(ProcessosTrabalhoDAO.getInstance().competencias));
-        let copiacompetenciasUsuario = JSON.parse(JSON.stringify(ProcessosTrabalhoDAO.getInstance().competenciasUsuario));
 
         let lista = Object.values(copiaProcessosTrabalho);
 
@@ -286,7 +308,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
             pt.filhos.map(transformar, this);
             if (pt.competencias !== undefined){
                 pt.competencias.forEach(idCompetencia =>{
-                    pt.filhos.push({...copiaCompetencias[idCompetencia], ...copiacompetenciasUsuario[idCompetencia]});
+                    pt.filhos.push({...copiaCompetencias[idCompetencia]});
                 });
             }
             return pt;

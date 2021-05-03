@@ -50,9 +50,9 @@ export class CompetenciasView extends HTMLElement{
         }
 
         //Cria os botões baseados nas competências ativas
-        this.competenciasUsuario = JSON.parse(JSON.stringify(ProcessosTrabalhoDAO.getInstance().competenciasUsuario));
+        this.competencias = JSON.parse(JSON.stringify(ProcessosTrabalhoDAO.getInstance().competencias));
 
-        Object.values(this.competenciasUsuario)
+        Object.values(this.competencias)
             .filter(competencia => competencia.ativa)
             .forEach( competencia => {
                 let botao = document.createElement("button");
