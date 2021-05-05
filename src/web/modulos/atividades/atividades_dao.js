@@ -31,7 +31,7 @@ export class AtividadesDAO{
         this.idBaseAtividades = `atividades_${cpf}`;
 
         //A primeira vez que roda pega os dados do javascript, depois usa o localStorage para guardas as mudanças
-        if (!localStorage.atividadesUsuario){     
+        if (!localStorage[this.idBaseAtividades]){
 
             console.log (`Base de dados de atividades do usuário não encontrada`);
 
@@ -39,12 +39,12 @@ export class AtividadesDAO{
             this.atividadesUsuario = {};
 
             console.log (`Salvando a base de dados de atividades do usuário no armazenamento local do navegador`);
-            localStorage.atividadesUsuario = JSON.stringify(this.atividadesUsuario);            
+            localStorage[this.idBaseAtividades] = JSON.stringify(this.atividadesUsuario);
 
         }else{            
             
             console.log (`Carregando base de dados de atividades do usuário do armazenamento local`);
-            this.atividadesUsuario = JSON.parse(localStorage.atividadesUsuario);            
+            this.atividadesUsuario = JSON.parse(localStorage[this.idBaseAtividades]);
         }
     }
 
