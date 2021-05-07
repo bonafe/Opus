@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt" manifest="./offline.appcache">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <title>Opus RFB</title>
@@ -26,8 +26,11 @@
     <!-- jsPanel: Janelas flutuantes-->
     <link rel="stylesheet" href="./bibliotecas/jspanel/jspanel.min.css">
 
+    <!-- Service Workers da Página -->
+     <script type="text/javascript" src="./sw.js"></script>
+
     <!-- Elementos da Tela -->
-    <script type="module">        
+    <script type="module">
         import { TrabalhoRFB } from './trabalho_rfb.js';
         window.onload = () => {
             window.trabalhoRFB = TrabalhoRFB.getInstance();
