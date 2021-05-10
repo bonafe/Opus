@@ -2,6 +2,9 @@ import http.server
 import ssl
 import os
 
+#Para rodar no chrome localmente
+#chrome --ignore-certificate-errors --unsafely-treat-insecure-origin-as-secure=https://localhost:4443
+
 web_dir = os.path.join(os.path.dirname(__file__), '../web')
 os.chdir(web_dir)
 
