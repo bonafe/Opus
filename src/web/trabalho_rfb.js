@@ -26,10 +26,13 @@ export class TrabalhoRFB{
 
     constructor() {
         UsuarioDAO.getInstance();
+        this.iniciarServiceWorkers();
         this.carregarConfiguracaoJanelas();
     }
 
+    iniciarServiceWorkers(){
 
+    }
 
     renderizar(){
 

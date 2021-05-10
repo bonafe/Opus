@@ -26,15 +26,22 @@
     <!-- jsPanel: Janelas flutuantes-->
     <link rel="stylesheet" href="./bibliotecas/jspanel/jspanel.min.css">
 
-    <!-- Service Workers da Página -->
-     <script type="text/javascript" src="./sw.js"></script>
-
     <!-- Elementos da Tela -->
     <script type="module">
         import { TrabalhoRFB } from './trabalho_rfb.js';
         window.onload = () => {
             window.trabalhoRFB = TrabalhoRFB.getInstance();
             window.trabalhoRFB.renderizar();
+        }
+
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('./sw.js')
+          .then(function(registration) {
+            console.log('Registration successful, scope is:', registration.scope);
+          })
+          .catch(function(error) {
+            console.log('Service worker registration failed, error:', error);
+          });
         }
     </script>
 </head>
