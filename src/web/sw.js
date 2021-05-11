@@ -1,12 +1,13 @@
 const arquivosCache = [
 '/',
+'/bibliotecas/',
+'/bibliotecas/jspanel/',
 '/bibliotecas/jspanel/jspanel.min.js',
 '/bibliotecas/jspanel/jspanel.min.css',
 '/bibliotecas/tabulator/css/tabulator.min.css',
-'/bibliotecas/tabulator/css/tabulator.scss',
 '/bibliotecas/tabulator/js/tabulator.min.js',
 '/bibliotecas/visjs/vis-network.min.js',
-'/bibliotecas/visjs/vis.timeline-graph2d.min.js',
+'/bibliotecas/visjs/vis-timeline-graph2d.min.js',
 '/bibliotecas/humanize-duration.js',
 '/modulos/atividades/atividades_view.js',
 '/modulos/atividades/atividades_dao.js',
@@ -16,7 +17,7 @@ const arquivosCache = [
 '/modulos/processos_trabalho/competencias_view.js',
 '/modulos/processos_trabalho/processos_trabalho_dao.js',
 '/modulos/processos_trabalho/processos_trabalho_view.js',
-'/TrabalhoRFB.html',
+'/index.html',
 '/trabalho_rfb.js'
 ];
 
@@ -31,10 +32,13 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(id_cache)
             .then(cache => {
+                //TODO: se algum arquivo está com o caminho errado ele da erro e não indica onde foi
+                //É importante fazer o código de forma a indicar onde o erro ocorreu
                 return cache.addAll(arquivosCache);
             })
             .catch(e => {
                 console.log ("Erro cache");
+                console.dir(e);
             })
     );
 });
