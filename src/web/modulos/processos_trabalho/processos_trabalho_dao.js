@@ -61,13 +61,22 @@ export class ProcessosTrabalhoDAO{
         localStorage[this.idBaseCompetencias] = JSON.stringify(this.competencias);
 
         if (competencia.criadaPeloUsuario){
+            console.log (`processo id: ${idProcessoTrabalho}`);
             let processoTrabalho = this.procurarProcessoTrabalho (idProcessoTrabalho, Object.values(this.processosTrabalho));
             if (processoTrabalho == null){
                 alert("Atenção! Não foi possível salvar competencia: processo de trabalho não encontrado!")
             }else{
                 console.log (`Salvando processo de trabalho com nova competencia na base de dados local do navegador`);
-                let competenciaEncontrada = processoTrabalho.competencias.filter (idCompetenciaLista => idCompetenciaLista == competencia.id);
-                if (competenciaEncontrada.length == 0){
+
+                let competenciaEncontrada = false;
+
+                if (processoTrabalho.competencias === undefined){
+                    processoTrabalho.competencias = [];
+                }else{
+                    competenciaEncontrada =  processoTrabalho.competencias.filter (idCompetenciaLista => idCompetenciaLista == competencia.id).length > 0;
+                }
+
+                if (!competenciaEncontrada){
                     processoTrabalho.competencias.push(competencia.id);
                     localStorage[this.idBaseProcessosTrabalho] = JSON.stringify(this.processosTrabalho);
                 }
@@ -87,6 +96,10 @@ export class ProcessosTrabalhoDAO{
             }
 
             return null;
+
+        }else if (processoTrabalho.id == idProcessoTrabalho){
+
+            return processoTrabalho;
 
         }else if (processoTrabalho.filhos[idProcessoTrabalho] !== undefined){
 

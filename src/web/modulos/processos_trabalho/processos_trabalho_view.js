@@ -163,7 +163,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
             cellEdited: celula => {
                 let processoTrabalho = celula.getRow().getTreeParent().getData();
                 let competenciaUsuario = celula.getRow().getData();
-                ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(processoTrabalho, competenciaUsuario);
+                ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(processoTrabalho.id, competenciaUsuario);
                 this.dispatchEvent (new CustomEvent(ProcessosTrabalhoView.EVENTO_EDITOU_PROCESSO_TRABALHO_USUARIO, {detail:competenciaUsuario}));
             },
              rowContextMenu: (componente, e) => {
