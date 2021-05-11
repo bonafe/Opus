@@ -1,4 +1,5 @@
-const filesToCache = [
+const arquivosCache = [
+'/',
 '/bibliotecas/jspanel/jspanel.min.js',
 '/bibliotecas/jspanel/jspanel.min.css',
 '/bibliotecas/tabulator/css/tabulator.min.css',
@@ -19,24 +20,49 @@ const filesToCache = [
 '/trabalho_rfb.js'
 ];
 
-const staticCacheName = 'pages-cache-v1';
+const id_cache = 'opus-cache-v1';
+
+console.log('Service Worker iniciando...');
 
 self.addEventListener('install', event => {
-  console.log('Attempting to install service worker and cache static assets');
-  event.waitUntil(
-    caches.open(staticCacheName)
-    .then(cache => {
-      return cache.add(filesToCache);
-    })
-  );
+    //debugger;
+    console.log('Service Worker instalado!!!');
+
+    event.waitUntil(
+        caches.open(id_cache)
+            .then(cache => {
+                return cache.addAll(arquivosCache);
+            })
+            .catch(e => {
+                console.log ("Erro cache");
+            })
+    );
 });
 
 
 
-self.addEventListener('fetch', function(event) {
-  event.respondWith(
-    caches.match(event.request).then(function(response) {
-      return response || fetch(event.request);
-    })
-  );
+self.addEventListener('activate', event => {
+  console.log('Service Worker ativado!');
+});
+
+
+
+self.addEventListener('fetch', event => {
+    console.log (`Service worker: FETCH:${event.request}`);
+    event.respondWith(
+        caches.match(event.request).then(response => {
+            return response || fetch(event.request);
+        })
+    );
+});
+
+
+
+self.addEventListener('push', event => {
+    event.waitUntil(
+        self.registration.showNotification("Título", {
+            body: "Você recebeu uma mensagem!",
+            tag: "push-tag-exemplo"
+        })
+    );
 });

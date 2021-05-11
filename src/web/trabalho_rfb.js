@@ -31,7 +31,13 @@ export class TrabalhoRFB{
     }
 
     iniciarServiceWorkers(){
-
+        navigator.serviceWorker.register('sw.js')
+            .then(function(registration) {
+                console.log('Service Worker registrado! Escopo:', registration.scope);
+            })
+            .catch(function(error) {
+                console.log('Falha no registro do Service Worker! Erro:', error);
+            });
     }
 
     renderizar(){

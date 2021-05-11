@@ -46,7 +46,7 @@ export class ProcessosTrabalhoDAO{
 
         }else{            
             
-            console.log (`Carregando base de dados do armazenamento local`);
+            //console.log (`Carregando base de dados do armazenamento local`);
             this.processosTrabalho = JSON.parse(localStorage[this.idBaseProcessosTrabalho]);
             this.competencias = JSON.parse(localStorage[this.idBaseCompetencias]);
         }

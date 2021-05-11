@@ -43,7 +43,7 @@ export class AtividadesDAO{
 
         }else{            
             
-            console.log (`Carregando base de dados de atividades do usuário do armazenamento local`);
+            //console.log (`Carregando base de dados de atividades do usuário do armazenamento local`);
             this.atividadesUsuario = JSON.parse(localStorage[this.idBaseAtividades]);
         }
     }

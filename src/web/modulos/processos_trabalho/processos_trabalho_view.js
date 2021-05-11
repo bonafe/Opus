@@ -70,7 +70,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
 
         }else{            
             
-            console.log (`Carregando configurações do armazenamento local`);
+            //console.log (`Carregando configurações do armazenamento local`);
             this.configuracoes = JSON.parse(localStorage.configuracoes);
         }
     }
