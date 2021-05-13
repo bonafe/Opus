@@ -83,4 +83,17 @@ export class AtividadesDAO{
         delete this.atividadesUsuario[id];
         this.salvarBase();
     }
+
+
+    atividadesCSV(){
+        const CABECALHO = ["id_competencia", "id_atividade", "inicio", "fim", "data_criacao"];
+        let linhas = [CABECALHO.join(";")];
+        Object.values(this.atividadesUsuario).forEach(atividade => linhas.push(this.atividadeCSV(atividade)));
+        return linhas.join("\n");
+    }
+
+
+    atividadeCSV(atividade){
+        return [atividade.competencia.id, atividade.id, atividade.inici, atividade.fim, atividade.dataCriacao].join(";");
+    }
 }

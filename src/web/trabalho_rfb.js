@@ -1,13 +1,15 @@
 
 //jsPanel: Janelas flutuantes
-import { jsPanel } from './bibliotecas/jspanel/jspanel.min.js';
+import { jsPanel } from '/bibliotecas/jspanel/jspanel.min.js';
 
 //Módulos locais
 import { ProcessosTrabalhoView } from "./modulos/processos_trabalho/processos_trabalho_view.js";
 import { AtividadesView } from "./modulos/atividades/atividades_view.js";
 import { CompetenciasView } from "./modulos/processos_trabalho/competencias_view.js";
-import { UsuarioDAO } from "./modulos/pessoas/usuario_dao.js";
 
+import { AtividadesDAO } from "./modulos/atividades/atividades_dao.js";
+import { ProcessosTrabalhoDAO } from "./modulos/processos_trabalho/processos_trabalho_dao.js";
+import { UsuarioDAO } from "./modulos/pessoas/usuario_dao.js";
 
 
 export class TrabalhoRFB{
@@ -157,5 +159,24 @@ export class TrabalhoRFB{
         delete localStorage.competenciasUsuario;
         delete localStorage.configuracaoPaineis;
         delete localStorage.configuracoes;
+    }
+
+
+    exportarCSV(){
+        let zip = new JSZip();
+        let cpf = UsuarioDAO.getInstance().usuario.cpf;
+
+        let arquivoAtividades = `${AtividadesDAO.getInstance().idBaseAtividades}.csv`;
+        let conteudoAtividades = AtividadesDAO.getInstance().atividadesCSV();
+        zip.file(arquivoAtividades,conteudoAtividades);
+
+        let arquivoProcessosTrabalho = `${ProcessosTrabalhoDAO.getInstance().idBaseProcessosTrabalho}.csv`;
+        let conteudoProcessosTrabalho = ProcessosTrabalhoDAO.getInstance().processosTrabalhoCSV();
+        zip.file(arquivoProcessosTrabalho, conteudoProcessosTrabalho);
+
+        zip.generateAsync({type:"blob"})
+        .then(function(content) {
+            saveAs(content, `${cpf}.zip`);
+        });
     }
 }

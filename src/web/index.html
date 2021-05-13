@@ -26,6 +26,9 @@
     <!-- jsPanel: Janelas flutuantes-->
     <link rel="stylesheet" href="./bibliotecas/jspanel/jspanel.min.css">
 
+    <script type="text/javascript" src="./bibliotecas/jszip.js"></script>
+    <script type="text/javascript" src="./bibliotecas/FileSaver.min.js"></script>
+
     <!-- Elementos da Tela -->
     <script type="module">
         import { TrabalhoRFB } from './trabalho_rfb.js';
@@ -51,6 +54,9 @@
                 </li>
                  <li class="nav-item">
                     <a class="nav-link" href="#">Atividades</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="window.trabalhoRFB.exportarCSV()">Exportar CSV</a>
                 </li>
             </ul>
         </div>

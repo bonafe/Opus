@@ -118,4 +118,7 @@ export class ProcessosTrabalhoDAO{
         }
     }
 
+    processosTrabalhoCSV(){
+        return "a;b;c\n1;2;3\n4;5;6\n";
+    }
 }

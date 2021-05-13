@@ -131,7 +131,7 @@ export class AtividadesView extends HTMLElement{
             inicio:inicio,
             fim:fim,
             competencia:competencia,
-            dataCriacao: agora.toISOString
+            dataCriacao: agora.toISOString()
         }
         AtividadesDAO.getInstance().salvarAtividadeUsuario(atividade);
         

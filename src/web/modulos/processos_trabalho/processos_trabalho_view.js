@@ -204,6 +204,51 @@ export class ProcessosTrabalhoView extends HTMLElement{
         this.filtrarProcessosTrabalho();
     }
 
+/*
+    editorNivel (cell, onRendered, success, cancel, editorParams){
+        //cell - the cell component for the editable cell
+        //onRendered - function to call when the editor has been rendered
+        //success - function to call to pass the successfuly updated value to Tabulator
+        //cancel - function to call to abort the edit and return to a normal cell
+        //editorParams - params object passed into the editorParams column definition property
+
+        let competencia = cell.getData();
+
+        if (competencia.filhos !== undefined){
+            return false;
+        }else{
+            //create and style editor
+            let editor = document.createElement("input");
+
+            editor.setAttribute("min", "0");
+            editor.setAttribute("max", "10");
+            //create and style input
+            editor.style.padding = "3px";
+            editor.style.width = "100%";
+            editor.style.boxSizing = "border-box";
+
+            //Set value of editor to the current value of the cell
+            editor.value = "ola";
+
+            //set focus on the select box when the editor is selected (timeout allows for editor to be added to DOM)
+            onRendered(function(){
+                editor.focus();
+                editor.style.css = "100%";
+            });
+
+            //when the value has been set, trigger the cell to update
+            function successFunc(){
+                success("oi");
+            }
+
+            editor.addEventListener("change", successFunc);
+            editor.addEventListener("blur", successFunc);
+
+            //return the editor element
+            return editor;
+        }
+    }
+*/
 
     adicionarCompetencia (processoTrabalho, tituloCompetencia){
 
@@ -243,6 +288,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
         let possuiConteudo = 
             (processoTrabalho.nivelProficiencia !== undefined) ||
             (processoTrabalho.nivelAfinidade !== undefined) ||
+            (processoTrabalho.criadaPeloUsuario !== undefined) ||
             this.verificaAtiva(processoTrabalho);
 
         return possuiConteudo;
