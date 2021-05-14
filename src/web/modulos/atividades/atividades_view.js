@@ -1,4 +1,5 @@
 import { AtividadesDAO } from './atividades_dao.js';
+import { UsuarioDAO } from '../pessoas/usuario_dao.js';
 
 export class AtividadesView extends HTMLElement{
 
@@ -62,9 +63,13 @@ export class AtividadesView extends HTMLElement{
             end: daquiAMeiaHora,
             editable: true,
             multiselect: true,
+            tooltip:{
+                followMouse: true
+            },
             onMove: item => {
                 console.log (`Atualizou item linha do tempo: ${item}`);
                 AtividadesDAO.getInstance().atualizarDuracaoAtividade(item.id, item.start, item.end);
+                this.dataSetTimeLine.update(item);
             },
             onRemove: item => {
                 console.log (`Removeu item linha do tempo: ${item}`);
@@ -81,9 +86,31 @@ export class AtividadesView extends HTMLElement{
         });
     
         this.timeline.on('rangechanged', properties => {
-            //console.dir(this.timeline);
-            //console.dir(properties);
-            //console.log('rangechanged');
+            let janela = this.timeline.getWindow().end.getTime() - this.timeline.getWindow().start.getTime();
+            let diasJanela = janela / 1000 / 60 / 60 / 24;
+            console.log(`Janela de ${diasJanela} dias`);
+
+            let tipoElemento = "point";
+
+            if (diasJanela > 2){
+                tipoElemento = "point";
+            }else{
+                tipoElemento = "range"
+            }
+
+            this.dataSetTimeLine.forEach(elemento => {
+                elemento.type = tipoElemento;
+                this.dataSetTimeLine.update(elemento);
+            });
+        });
+
+        this.timeline.on ('doubleClick', obj => {
+            if (obj.event instanceof MouseEvent){
+                console.log ("mouse");
+                let conteudo = prompt("Digite o conteúdo da atividade:");
+                let atividade = AtividadesDAO.getInstance().atualizarConteudo(obj.item, conteudo);
+                this.dataSetTimeLine.update({id:obj.item, title:this.tituloAtividade(atividade)});
+            }
         });
     }
 
@@ -94,10 +121,14 @@ export class AtividadesView extends HTMLElement{
             start: atividade.inicio,
             end: atividade.fim,
             content: atividade.competencia.titulo,
-            type: "range"
+            type: "range",
+            title: this.tituloAtividade(atividade)
         };
     }
 
+    tituloAtividade (atividade){
+        return atividade.competencia.titulo + ((atividade.conteudo !== undefined) && (atividade.conteudo.length > 0) ? `: ${atividade.conteudo}` : "");
+    }
 
 
     adicionarAtividadeDepoisDaMaisRecente(competencia){
@@ -126,11 +157,14 @@ export class AtividadesView extends HTMLElement{
 
         let agora = new Date();
 
+        let cpf = UsuarioDAO.getInstance().usuario.cpf;
+
         let atividade = {
-            id:`${agora.getTime()}_${competencia.id}`,
+            id:`${agora.getTime()}_${cpf}`,
             inicio:inicio,
             fim:fim,
             competencia:competencia,
+            conteudo: "",
             dataCriacao: agora.toISOString()
         }
         AtividadesDAO.getInstance().salvarAtividadeUsuario(atividade);

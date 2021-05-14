@@ -164,7 +164,7 @@ export class ProcessosTrabalhoDAO{
             competencia.nivelProficiencia,
             competencia.nivelAfinidade,
             competencia.ativa,
-            competencia.criadoPeloUsuario
+            competencia.criadaPeloUsuario
         ].join(";");
     }
 }

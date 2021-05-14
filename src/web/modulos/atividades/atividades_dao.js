@@ -51,7 +51,7 @@ export class AtividadesDAO{
 
     salvarBase(){
         console.log (`Salvando competencia do usuário na base de dados local do navegador`);
-        localStorage.atividadesUsuario = JSON.stringify(this.atividadesUsuario);
+        localStorage[this.idBaseAtividades] = JSON.stringify(this.atividadesUsuario);
     }
 
 
@@ -78,6 +78,19 @@ export class AtividadesDAO{
     }
 
 
+    atualizarConteudo(id, conteudo){
+
+        console.log (`Atualizando atividade do usuário`);
+
+        let atividade = this.atividadesUsuario[id];
+        atividade.conteudo = conteudo;
+
+        this.atividadesUsuario[id] = atividade;
+        this.salvarBase();
+
+        return atividade;
+    }
+
 
     removerAtividade(id){
         delete this.atividadesUsuario[id];
@@ -86,7 +99,7 @@ export class AtividadesDAO{
 
 
     atividadesCSV(){
-        const CABECALHO = ["id_competencia", "id_atividade", "inicio", "fim", "data_criacao"];
+        const CABECALHO = ["id_competencia", "id_atividade", "inicio", "fim", "data_criacao", "conteudo"];
         let linhas = [CABECALHO.join(";")];
         Object.values(this.atividadesUsuario).forEach(atividade => linhas.push(this.atividadeCSV(atividade)));
         return linhas.join("\n");
@@ -94,6 +107,6 @@ export class AtividadesDAO{
 
 
     atividadeCSV(atividade){
-        return [atividade.competencia.id, atividade.id, atividade.inici, atividade.fim, atividade.dataCriacao].join(";");
+        return [atividade.competencia.id, atividade.id, atividade.inicio, atividade.fim, atividade.dataCriacao, atividade.conteudo].join(";");
     }
 }

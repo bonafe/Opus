@@ -165,7 +165,8 @@ export class TrabalhoRFB{
     exportarCSV(){
         let zip = new JSZip();
         let cpf = UsuarioDAO.getInstance().usuario.cpf;
-
+        let agora = new Date();
+        let arquivoZIP = `${agora.getFullYear()}_${agora.getMonth()+1}_${agora.getDay()}_${agora.getHours()}_${agora.getMinutes()}-Relatório Opus RFB-${cpf}.zip`;
         let arquivoAtividades = `${AtividadesDAO.getInstance().idBaseAtividades}.csv`;
         let conteudoAtividades = AtividadesDAO.getInstance().atividadesCSV();
         zip.file(arquivoAtividades,conteudoAtividades);
@@ -176,7 +177,7 @@ export class TrabalhoRFB{
 
         zip.generateAsync({type:"blob"})
         .then(function(content) {
-            saveAs(content, `${cpf}.zip`);
+            saveAs(content, arquivoZIP);
         });
     }
 }
