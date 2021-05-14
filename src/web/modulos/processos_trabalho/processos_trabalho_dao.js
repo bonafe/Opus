@@ -118,7 +118,53 @@ export class ProcessosTrabalhoDAO{
         }
     }
 
+
+
     processosTrabalhoCSV(){
-        return "a;b;c\n1;2;3\n4;5;6\n";
+        const CABECALHO = ["id_macroprocesso", "titulo_macroprocesso", "id_subprocesso", "titulo_subprocesso", "id_processo", "titulo_processo", "id_competencia", "titulo_competencia", "proficiencia", "afinidade", "tarefa", "criada_pelo_usuario"];
+        let linhas = [CABECALHO.join(";")];
+
+
+        Object.values(this.processosTrabalho).forEach(macroprocesso => {
+            Object.values(macroprocesso.filhos).forEach(processo => {
+                Object.values(processo.filhos).forEach(subprocesso => {
+                    linhas = linhas.concat(this.competenciasCSV (macroprocesso, processo, subprocesso, subprocesso.competencias));
+                });
+                linhas = linhas.concat(this.competenciasCSV (macroprocesso, processo, null, processo.competencias));
+            });
+            linhas = linhas.concat(this.competenciasCSV (macroprocesso, null, null, macroprocesso.competencias));
+        });
+        return linhas.join("\n");
+    }
+
+
+
+    competenciasCSV (macroprocesso, processo, subprocesso, competencias){
+        let competenciasCSV = [];
+        if (competencias !== undefined){
+            competencias.forEach(id_competencia => {
+                competenciasCSV.push(this.competenciaCSV (macroprocesso, processo, subprocesso, this.competencias[id_competencia]));
+            });
+        }
+        return competenciasCSV;
+    }
+
+
+
+    competenciaCSV (macroprocesso, processo, subprocesso, competencia){
+        return [
+            (macroprocesso !== null?macroprocesso.id:""),
+            (macroprocesso !== null?macroprocesso.titulo:""),
+            (processo !== null?processo.id:""),
+            (processo !== null?processo.titulo:""),
+            (subprocesso !== null?subprocesso.id:""),
+            (subprocesso !== null?subprocesso.titulo:""),
+            competencia.id,
+            competencia.titulo,
+            competencia.nivelProficiencia,
+            competencia.nivelAfinidade,
+            competencia.ativa,
+            competencia.criadoPeloUsuario
+        ].join(";");
     }
 }
