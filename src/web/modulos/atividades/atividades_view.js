@@ -52,6 +52,14 @@ export class AtividadesView extends HTMLElement{
                 ))
             );
 
+        this.dataSetTimeLine.add([{
+            id: 'centro',
+            type: 'background',
+            content: 'fundo',
+            start: new Date().getTime(),
+            end: new Date().getTime() + 1000 * 60 * 30,
+        }]);
+
         let agora = new Date();
         let dozeHoraAtras = agora.valueOf() - 1000 * 60 * 60 * 12; //30 minutos = 1000 * 60 * 30 milissegundos
         //let daquiAUmMinuto = agora.valueOf() + 1000 * 60; //1 minuto = 1000 * 60 milissegundos
@@ -148,7 +156,9 @@ export class AtividadesView extends HTMLElement{
             dataFimItemMaisRecente = (new Date()).getTime() - duracaoPadrao;
         }
 
-        this.adicionarAtividade(competencia, dataFimItemMaisRecente, dataFimItemMaisRecente + duracaoPadrao);
+        let agora = (new Date()).getTime();
+
+        this.adicionarAtividade(competencia, agora - duracaoPadrao, agora);
     }
 
 

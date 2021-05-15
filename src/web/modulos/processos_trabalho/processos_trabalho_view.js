@@ -186,7 +186,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
                         });
                     }
                 }else {
-
+                    if (processoTrabalho.competencias)
                     menu.push({
                         label:"Adicionar",
                         action:(e, linha) => {
