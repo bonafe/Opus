@@ -3,6 +3,7 @@ import { UsuarioDAO } from '../pessoas/usuario_dao.js';
 
 export class AtividadesView extends HTMLElement{
 
+    static DURACAO_PADRAO = 45;
 
     static EVENTO_CRIAR_ATIVIDADE = "criarAtividade";
 
@@ -55,9 +56,9 @@ export class AtividadesView extends HTMLElement{
         this.dataSetTimeLine.add([{
             id: 'centro',
             type: 'background',
-            content: 'fundo',
             start: new Date().getTime(),
             end: new Date().getTime() + 1000 * 60 * 30,
+            tipo: 'indicador_lancamento'
         }]);
 
         let agora = new Date();
@@ -89,27 +90,11 @@ export class AtividadesView extends HTMLElement{
         this.timeline = new vis.Timeline(container, this.dataSetTimeLine, options);
 
         this.timeline.on('rangechange', properties => {
-            //console.dir(properties);
-            //console.log('rangechange');
+            this.atualizarTipoElementos();
         });
     
         this.timeline.on('rangechanged', properties => {
-            let janela = this.timeline.getWindow().end.getTime() - this.timeline.getWindow().start.getTime();
-            let diasJanela = janela / 1000 / 60 / 60 / 24;
-            console.log(`Janela de ${diasJanela} dias`);
-
-            let tipoElemento = "point";
-
-            if (diasJanela > 2){
-                tipoElemento = "point";
-            }else{
-                tipoElemento = "range"
-            }
-
-            this.dataSetTimeLine.forEach(elemento => {
-                elemento.type = tipoElemento;
-                this.dataSetTimeLine.update(elemento);
-            });
+            this.atualizarTipoElementos();
         });
 
         this.timeline.on ('doubleClick', obj => {
@@ -122,6 +107,37 @@ export class AtividadesView extends HTMLElement{
         });
     }
 
+    centroJanela(){
+        let janela = this.timeline.getWindow().end.getTime() - this.timeline.getWindow().start.getTime();
+        let centroJanela = this.timeline.getWindow().start.getTime() + (janela/2);
+        return centroJanela;
+    }
+
+    atualizarTipoElementos(){
+        let janela = this.timeline.getWindow().end.getTime() - this.timeline.getWindow().start.getTime();
+        let diasJanela = janela / 1000 / 60 / 60 / 24;
+        console.log(`Janela de ${diasJanela} dias`);
+
+        let tipoElemento = "range";
+
+        if (diasJanela > 1.29){
+            tipoElemento = "box";
+        }else{
+            tipoElemento = "range";
+        }
+
+        this.dataSetTimeLine.forEach(elemento => {
+            if (elemento.tipo == "atividade"){
+                elemento.type = tipoElemento;
+                this.dataSetTimeLine.update(elemento);
+            }else if (elemento.tipo == "indicador_lancamento"){
+                elemento.start = this.centroJanela();
+                elemento.end = this.centroJanela() + 1000 * 60 * 30;
+                this.dataSetTimeLine.update(elemento);
+            }
+        });
+    }
+
 
     criarItemTimeline (atividade){
         return {
@@ -130,7 +146,8 @@ export class AtividadesView extends HTMLElement{
             end: atividade.fim,
             content: atividade.competencia.titulo,
             type: "range",
-            title: this.tituloAtividade(atividade)
+            title: this.tituloAtividade(atividade),
+            tipo: "atividade"
         };
     }
 
@@ -149,7 +166,7 @@ export class AtividadesView extends HTMLElement{
             }
         });
 
-        let duracaoPadrao = 45 * 60 * 1000;
+        let duracaoPadrao = (competencia.duracaoPadrao === undefined ? AtividadesView.DURACAO_PADRAO : competencia.duracaoPadrao) * 60 * 1000;
 
         //Se não existrem items
         if (dataFimItemMaisRecente == 0){
@@ -157,8 +174,8 @@ export class AtividadesView extends HTMLElement{
         }
 
         let agora = (new Date()).getTime();
-
-        this.adicionarAtividade(competencia, agora - duracaoPadrao, agora);
+        let centro = this.centroJanela();
+        this.adicionarAtividade(competencia, centro - duracaoPadrao, centro);
     }
 
 

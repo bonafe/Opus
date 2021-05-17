@@ -3,6 +3,7 @@ import { UsuarioDAO } from '../pessoas/usuario_dao.js';
 
 export class ProcessosTrabalhoView extends HTMLElement{
 
+    static TAMANHO_MINIMO_PROCURA = 4;
 
     static EVENTO_EDITOU_PROCESSO_TRABALHO_USUARIO = "editouProcessoTrabalhoUsuario";
     
@@ -27,6 +28,9 @@ export class ProcessosTrabalhoView extends HTMLElement{
                         <label class="checkbox-inline">
                         <input type="radio" name="filtro" value="preenchidos">Competências preenchidas
                         </label>
+                        <label class="checkbox-inline">
+                        <input type="radio" name="filtro" value="procurar"></input>Procurar <input type="text" id="processoProcurado"></input>
+                        </label>
                     </form>
                     <div class="container-flex">
                         <style>
@@ -49,6 +53,8 @@ export class ProcessosTrabalhoView extends HTMLElement{
         this._shadowRoot = this.attachShadow({mode: 'open'});
         this._shadowRoot.appendChild(ProcessosTrabalhoView.TEMPLATE.content.cloneNode(true));        
 
+        this.deveFiltrar = false;
+
         this.carregarConfiguracoes();
         this.inicializarFiltros();        
     }
@@ -64,7 +70,8 @@ export class ProcessosTrabalhoView extends HTMLElement{
             console.log (`Configurações não encontradas na base de dados local`);
             console.log (`Inicializando configuração com valores padrão`);
             this.configuracoes = {
-                filtro: "ativas"
+                filtro: "ativas",
+                valorProcurado: ""
             };
             this.salvarConfiguracoes();
 
@@ -85,15 +92,32 @@ export class ProcessosTrabalhoView extends HTMLElement{
 
 
     inicializarFiltros(){
-        this._shadowRoot.querySelectorAll("input").forEach(elemento => {
+        this._shadowRoot.querySelectorAll("input[name='filtro']").forEach(elemento => {
             elemento.addEventListener("click", evento => {
                 console.log (`Aplicar filtro: ${elemento.value}`);
                 this.configuracoes.filtro = elemento.value;
                 this.salvarConfiguracoes();
-                this.filtrarProcessosTrabalho();
+                this.selecionarProcessosTrabalho();
             });
         });
         this._shadowRoot.querySelector(`input[value='${this.configuracoes.filtro}']`).checked = true;
+
+        let inputValor = this._shadowRoot.querySelector("#processoProcurado");
+        inputValor.value = this.configuracoes.valorProcurado;
+        inputValor.addEventListener("input", (evento) => {
+
+            this._shadowRoot.querySelector("input[value='procurar']").checked = true;
+
+            this.configuracoes.filtro = "procurar";
+            this.configuracoes.valorProcurado = evento.target.value;
+            this.salvarConfiguracoes();
+
+            clearTimeout(this.idTimerProcurar);
+
+            this.idTimerProcurar = setTimeout (()=>{
+                this.selecionarProcessosTrabalho();
+            }, 1000);
+        });
     }
 
 
@@ -114,26 +138,26 @@ export class ProcessosTrabalhoView extends HTMLElement{
             height:350,            
             layout:"fitColumns",
             columns:[                
-                {title:"Processos de Trabalho", field:"titulo", width:450, headerFilter:true},
-                {title:"Proficiência", field:"nivelProficiencia", width:180, hozAlign:"center", formatter:"star", formatterParams:{stars:5}, editor:true, headerFilter:true,
+                {title:"Processos de Trabalho", field:"titulo", width:450},
+                {title:"Proficiência", field:"nivelProficiencia", width:180, hozAlign:"center", formatter:"star", formatterParams:{stars:5}, editor:true,
                     cellEdited: celula => {
                         console.log(`Nível de Proficiência: ${celula.getValue()}`)
                     },
                         editable: celula => (celula.getRow().getData().filhos === undefined)
                     },
-                {title:"Afinidade", field:"nivelAfinidade", width:160, hozAlign:"center", formatter:"star", formatterParams:{stars:5}, editor:true, headerFilter:true,
+                {title:"Afinidade", field:"nivelAfinidade", width:160, hozAlign:"center", formatter:"star", formatterParams:{stars:5}, editor:true,
                     cellEdited: celula => {
                         console.log(`Nível de Afinidade: ${celula.getValue()}`)
                     },
                     editable: celula => (celula.getRow().getData().filhos === undefined)
                 },
-                {title:"Duração", field:"duracaoMedia", width:145, hozAlign:"center", editor:"input", headerFilter:true,
+                {title:"Duração", field:"duracaoPadrao", width:145, hozAlign:"center", editor:"input",
                     ccellEdited: celula => {
                         console.log(`Duração Padrão: ${celula.getValue()}`)
                     },
                     editable: celula => (celula.getRow().getData().filhos === undefined)
                 },
-                {title:"Tarefa", field:"ativa", width:120, hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true, headerFilter:true,
+                {title:"Tarefa", field:"ativa", width:120, hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true,
                     cellEdited: celula => {
                         console.log(`Ativa: ${celula.getValue()}`)
                     },
@@ -201,54 +225,9 @@ export class ProcessosTrabalhoView extends HTMLElement{
              }
         });
 
-        this.filtrarProcessosTrabalho();
+        this.selecionarProcessosTrabalho();
     }
 
-/*
-    editorNivel (cell, onRendered, success, cancel, editorParams){
-        //cell - the cell component for the editable cell
-        //onRendered - function to call when the editor has been rendered
-        //success - function to call to pass the successfuly updated value to Tabulator
-        //cancel - function to call to abort the edit and return to a normal cell
-        //editorParams - params object passed into the editorParams column definition property
-
-        let competencia = cell.getData();
-
-        if (competencia.filhos !== undefined){
-            return false;
-        }else{
-            //create and style editor
-            let editor = document.createElement("input");
-
-            editor.setAttribute("min", "0");
-            editor.setAttribute("max", "10");
-            //create and style input
-            editor.style.padding = "3px";
-            editor.style.width = "100%";
-            editor.style.boxSizing = "border-box";
-
-            //Set value of editor to the current value of the cell
-            editor.value = "ola";
-
-            //set focus on the select box when the editor is selected (timeout allows for editor to be added to DOM)
-            onRendered(function(){
-                editor.focus();
-                editor.style.css = "100%";
-            });
-
-            //when the value has been set, trigger the cell to update
-            function successFunc(){
-                success("oi");
-            }
-
-            editor.addEventListener("change", successFunc);
-            editor.addEventListener("blur", successFunc);
-
-            //return the editor element
-            return editor;
-        }
-    }
-*/
 
     adicionarCompetencia (processoTrabalho, tituloCompetencia){
 
@@ -271,6 +250,15 @@ export class ProcessosTrabalhoView extends HTMLElement{
         };
         ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(processoTrabalho.id, competencia);
         return competencia;
+    }
+
+
+    verificaFiltroTitulo (processoTrabalho){
+        if (this.configuracoes.valorProcurado.length < ProcessosTrabalhoView.TAMANHO_MINIMO_PROCURA){
+            return false;
+        }else{
+            return processoTrabalho.titulo.toLowerCase().indexOf(this.configuracoes.valorProcurado.toLowerCase()) != -1;
+        }
     }
 
 
@@ -365,17 +353,23 @@ export class ProcessosTrabalhoView extends HTMLElement{
 
 
 
-    filtrarProcessosTrabalho(){
-                
+    selecionarProcessosTrabalho(){
         let dicionarioDeFiltrosEFuncoes = {
             "ativas": this.verificaAtiva,
             "preenchidos": this.verificaSePossuiConteudo.bind(this),
-            "todos": processoTrabalho => true
+            "todos": processoTrabalho => true,
+            "procurar": this.verificaFiltroTitulo.bind(this)
         };
-                
+        this.filtrarProcessosTrabalho(dicionarioDeFiltrosEFuncoes[this.configuracoes.filtro]);
+    }
+
+
+
+    filtrarProcessosTrabalho(funcaoFiltro){
+
         //Cria uma copia da lista completa pois as funções a seguir modificação seu conteudo
         this.processosTrabalho = this.transformarBaseProcessosTrabalho();
-        this.processosTrabalho = this.processosTrabalho.filter(this.criarFuncaoDeFiltro(dicionarioDeFiltrosEFuncoes[this.configuracoes.filtro]), this);
+        this.processosTrabalho = this.processosTrabalho.filter(this.criarFuncaoDeFiltro(funcaoFiltro), this);
 
         //Filtra os elementos baseado na função de condição escolhida
         this.tabela.setData(this.processosTrabalho);
@@ -384,7 +378,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
         if (this.configuracoes.filtro != "todos"){
 
             //Abre a estrutura de árvore conforme a condição escolhida
-            this.tabela.getRows().forEach( linha => this.abrirArvoreTabelaProcessosTrabalho(linha,dicionarioDeFiltrosEFuncoes[this.configuracoes.filtro]));
+            this.tabela.getRows().forEach( linha => this.abrirArvoreTabelaProcessosTrabalho(linha,funcaoFiltro));
         }
     }  
 }

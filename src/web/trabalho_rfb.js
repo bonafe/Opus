@@ -180,4 +180,23 @@ export class TrabalhoRFB{
             saveAs(content, arquivoZIP);
         });
     }
+
+    fazerBackup(){
+        let zip = new JSZip();
+        let cpf = UsuarioDAO.getInstance().usuario.cpf;
+        let agora = new Date();
+        let arquivoZIP = `${agora.getFullYear()}_${agora.getMonth()+1}_${agora.getDay()}_${agora.getHours()}_${agora.getMinutes()}-Backup Opus RFB-${cpf}.zip`;
+        let arquivoAtividades = `${AtividadesDAO.getInstance().idBaseAtividades}.csv`;
+        let conteudoAtividades = JSON.stringify(AtividadesDAO.getInstance().atividades);
+        zip.file(arquivoAtividades,conteudoAtividades);
+
+        let arquivoProcessosTrabalho = `${ProcessosTrabalhoDAO.getInstance().idBaseProcessosTrabalho}.csv`;
+        let conteudoProcessosTrabalho = JSON.stringify(ProcessosTrabalhoDAO.getInstance().processosTrabalho);
+        zip.file(arquivoProcessosTrabalho, conteudoProcessosTrabalho);
+
+        zip.generateAsync({type:"blob"})
+        .then(function(content) {
+            saveAs(content, arquivoZIP);
+        });
+    }
 }
