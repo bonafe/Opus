@@ -138,7 +138,13 @@ export class ProcessosTrabalhoView extends HTMLElement{
             height:350,            
             layout:"fitColumns",
             columns:[                
-                {title:"Processos de Trabalho", field:"titulo", width:450},
+                {title:"Processos de Trabalho", field:"titulo", width:450, formatter:(celula, parametros, onRendered)=>{
+                    if (celula.getData().criadaPeloUsuario !== undefined){
+                        return `<b>${celula.getValue()}</b>`;
+                    }else{
+                        return celula.getValue();
+                    }
+                }},
                 {title:"Proficiência", field:"nivelProficiencia", width:180, hozAlign:"center", formatter:"star", formatterParams:{stars:5}, editor:true,
                     cellEdited: celula => {
                         console.log(`Nível de Proficiência: ${celula.getValue()}`)
@@ -210,16 +216,18 @@ export class ProcessosTrabalhoView extends HTMLElement{
                         });
                     }
                 }else {
-                    if (processoTrabalho.competencias)
-                    menu.push({
-                        label:"Adicionar",
-                        action:(e, linha) => {
-                            linha.addTreeChild(
-                                this.adicionarCompetencia(
-                                    linha.getData(), //processo de trabalho
-                                    prompt("Digite o título da nova competência")));
-                        }
-                    });
+                    if (processoTrabalho.competencias){
+                        //TODO: ordernar no momento em que adicionar
+                        menu.push({
+                            label:"Adicionar",
+                            action:(e, linha) => {
+                                linha.addTreeChild(
+                                    this.adicionarCompetencia(
+                                        linha.getData(), //processo de trabalho
+                                        prompt("Digite o título da nova competência")));
+                            }
+                        });
+                    }
                 }
                 return menu;
              }
@@ -327,7 +335,17 @@ export class ProcessosTrabalhoView extends HTMLElement{
 
         return ehFilhoOuExisteFilhoComCondicao;
     }
-    
+
+    compararProcessosTrabalhos (e1, e2){
+        let comp = e1.titulo.localeCompare(e2.titulo);
+        if ((e1.criadaPeloUsuario && e2.criadaPeloUsuario) || (!e1.criadaPeloUsuario && !e2.criadaPeloUsuario)){
+            return comp;
+        }else if (e1.criadaPeloUsuario){
+            return -1;
+        }else{
+            return 1;
+        }
+    }
 
 
     transformarBaseProcessosTrabalho(){
@@ -335,7 +353,8 @@ export class ProcessosTrabalhoView extends HTMLElement{
         let copiaProcessosTrabalho = JSON.parse(JSON.stringify(ProcessosTrabalhoDAO.getInstance().processosTrabalho));
         let copiaCompetencias = JSON.parse(JSON.stringify(ProcessosTrabalhoDAO.getInstance().competencias));
 
-        let lista = Object.values(copiaProcessosTrabalho);
+        //TODO: melhorar ordenação, permitir que o usuário ordene
+        let lista = Object.values(copiaProcessosTrabalho).sort(this.compararProcessosTrabalhos);
 
         lista.map(function transformar(pt){
             pt.filhos = Object.values(pt.filhos);
@@ -345,6 +364,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
                     pt.filhos.push({...copiaCompetencias[idCompetencia]});
                 });
             }
+            pt.filhos = Object.values(pt.filhos).sort(this.compararProcessosTrabalhos);
             return pt;
         },this); 
 
