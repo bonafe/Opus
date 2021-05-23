@@ -113,8 +113,12 @@ export class AtividadesView extends HTMLElement{
         return centroJanela;
     }
 
+
+
     atualizarTipoElementos(){
+
         let janela = this.timeline.getWindow().end.getTime() - this.timeline.getWindow().start.getTime();
+
         let diasJanela = janela / 1000 / 60 / 60 / 24;
         console.log(`Janela de ${diasJanela} dias`);
 
@@ -131,8 +135,13 @@ export class AtividadesView extends HTMLElement{
                 elemento.type = tipoElemento;
                 this.dataSetTimeLine.update(elemento);
             }else if (elemento.tipo == "indicador_lancamento"){
-                elemento.start = this.centroJanela();
-                elemento.end = this.centroJanela() + 1000 * 60 * 30;
+                let percentualTamanhoIndicador = 0.1;
+                let tamanhoIndicador = percentualTamanhoIndicador*janela;
+                let horarioCentro = new Date(this.centroJanela());
+                let legenda = `${("0"+horarioCentro.getHours()).slice(-2)}:${("0"+horarioCentro.getMinutes()).slice(-2)}`;
+                elemento.start = this.centroJanela() - (tamanhoIndicador/2);
+                elemento.end = this.centroJanela() + (tamanhoIndicador/2);
+                elemento.content = legenda;
                 this.dataSetTimeLine.update(elemento);
             }
         });
@@ -156,26 +165,13 @@ export class AtividadesView extends HTMLElement{
     }
 
 
-    adicionarAtividadeDepoisDaMaisRecente(competencia){
-
-        let dataFimItemMaisRecente = 0;
-
-        this.dataSetTimeLine.forEach(item => {
-            if (item.end > dataFimItemMaisRecente){
-                dataFimItemMaisRecente = item.end;
-            }
-        });
+    adicionarAtividade(competencia){
 
         let duracaoPadrao = this.calcularDuracaoPadrao(competencia);
 
-        //Se não existrem items
-        if (dataFimItemMaisRecente == 0){
-            dataFimItemMaisRecente = (new Date()).getTime() - duracaoPadrao;
-        }
-
         let agora = (new Date()).getTime();
         let centro = this.centroJanela();
-        this.adicionarAtividade(competencia, centro - duracaoPadrao, centro);
+        this.adicionarAtividadeComPeriodo(competencia, centro - duracaoPadrao, centro);
     }
 
 
@@ -188,7 +184,7 @@ export class AtividadesView extends HTMLElement{
     }
 
 
-    adicionarAtividade (competencia, inicio, fim){
+    adicionarAtividadeComPeriodo (competencia, inicio, fim){
 
         let agora = new Date();
 

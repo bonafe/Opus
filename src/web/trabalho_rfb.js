@@ -91,7 +91,7 @@ export class TrabalhoRFB{
         this.competencias.addEventListener (AtividadesView.EVENTO_CRIAR_ATIVIDADE, evento => {
             let competencia = evento.detail;
             console.log ("adicionarAtividade");
-            this.atividades.adicionarAtividadeDepoisDaMaisRecente(competencia);
+            this.atividades.adicionarAtividade(competencia);
         });
         this.competencias.renderizar();
 
