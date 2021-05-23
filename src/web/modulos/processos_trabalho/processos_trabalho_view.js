@@ -60,7 +60,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
     }
 
     redimensionar(largura, altura){
-        this.tabela.setHeight(altura-80);
+        this.tabela.setHeight(altura-100);
     }
 
 

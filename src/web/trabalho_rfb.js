@@ -27,6 +27,9 @@ export class TrabalhoRFB{
 
 
     constructor() {
+        this.paineis = {};
+        this.configuracoesPaineis = {};
+
         UsuarioDAO.getInstance();
         this.iniciarServiceWorkers();
         this.carregarConfiguracaoJanelas();
@@ -68,39 +71,39 @@ export class TrabalhoRFB{
             this.atividades.adicionarAtividadeDepoisDaMaisRecente(competencia);
         });
         this.competencias.renderizar();
-    
+
+
     
         document.addEventListener("jspanelresizestop", evento => {
-            this.salvarPosicaoPainel(evento.panel);
-            if (evento.panel.id == "processosTrabalho"){
-                this.processosTrabalho.redimensionar(parseInt(evento.panel.style.width, 10), parseInt(evento.panel.style.height, 10));
-            }
+            this.atualizarConfiguracoes();
         });
     
         document.addEventListener("jspanelresize", evento => {
            //TODO: fica lento se redimensionar em tempo real
            //this.processosTrabalho.redimensionar(parseInt(evento.panel.style.width, 10), parseInt(evento.panel.style.height, 10));
         });
-    
-    
-        document.addEventListener("jspaneldragstop", evento => {
-            this.salvarPosicaoPainel(evento.panel);
+
+        document.addEventListener("jspanelmaximized", evento => {
+            this.atualizarConfiguracoes();
         });
+
+        document.addEventListener("jspanelnormalized", evento => {
+            this.atualizarConfiguracoes();
+        });
+
+        document.addEventListener("jspaneldragstop", evento => {
+            this.atualizarConfiguracoes();
+        });
+
+        document.addEventListener("jspanelfronted", evento => {
+            this.atualizarConfiguracoes();
+        });
+
+        this.aplicarConfiguracoes();
     }
 
 
-
     criarPainel (id, titulo, conteudo){
-        let configuracao  = this.paineis[id];
-
-        if (configuracao === undefined){
-            configuracao = {
-                altura: Math.min(500, this.innerHeight*0.6),
-                largura: Math.min(800, this.innerWidth*0.9),
-                x: 10,
-                y: 10
-            };
-        }
 
         let painel = jsPanel.create({
             id: id,
@@ -112,41 +115,84 @@ export class TrabalhoRFB{
             content: conteudo
         });
 
-        painel.style.height = configuracao.altura;
-        painel.style.width = configuracao.largura;
-        painel.style.left = configuracao.x;
-        painel.style.top = configuracao.y;
+        this.paineis[painel.id] = painel;
 
         return painel;
     }
 
 
+    redimensionarConteudoPaineis(){
+        this.processosTrabalho.redimensionar(parseInt(this.paineis["processosTrabalho"].style.width, 10), parseInt(this.paineis["processosTrabalho"].style.height, 10));
+    }
 
-    salvarPosicaoPainel (painel) {
 
-        this.paineis[painel.id] = {
+
+    aplicarConfiguracoes(){
+        Object.values(this.paineis).forEach(painel => {
+            this.aplicarConfiguracoesPainel (painel);
+        });
+        this.redimensionarConteudoPaineis();
+    }
+
+
+
+     aplicarConfiguracoesPainel (painel) {
+
+        if (this.configuracoesPaineis[painel.id] === undefined){
+            this.configuracoesPaineis[painel.id] = {
+                altura: Math.min(500, this.innerHeight*0.6),
+                largura: Math.min(800, this.innerWidth*0.9),
+                x: 10,
+                y: 10,
+                z: undefined
+            };
+        }
+
+        painel.style.height = this.configuracoesPaineis[painel.id].altura;
+        painel.style.width = this.configuracoesPaineis[painel.id].largura;
+        painel.style.left = this.configuracoesPaineis[painel.id].x;
+        painel.style.top = this.configuracoesPaineis[painel.id].y;
+
+        if (this.configuracoesPaineis[painel.id].z !== undefined){
+            painel.style.zIndex = this.configuracoesPaineis[painel.id].z;
+        }
+    }
+
+
+
+    atualizarConfiguracoes(){
+        Object.values(this.paineis).forEach(painel => {
+            this.atualizarConfiguracoesPainel (painel);
+        });
+        this.salvarConfiguracaoJanelas();
+        this.redimensionarConteudoPaineis();
+    }
+
+
+    atualizarConfiguracoesPainel (painel) {
+
+        this.configuracoesPaineis[painel.id] = {
             altura: painel.style.height,
             largura: painel.style.width,
             x: painel.style.left,
-            y: painel.style.top
+            y: painel.style.top,
+            z: painel.style.zIndex
         };
-
-        this.salvarConfiguracaoJanelas();
     }
 
 
 
     salvarConfiguracaoJanelas () {
-        localStorage.configuracaoPaineis = JSON.stringify (this.paineis);
+        localStorage.configuracaoPaineis = JSON.stringify (this.configuracoesPaineis);
     }
 
 
 
     carregarConfiguracaoJanelas (){
         if (localStorage.configuracaoPaineis !== undefined){
-            this.paineis = JSON.parse(localStorage.configuracaoPaineis);
+            this.configuracoesPaineis = JSON.parse(localStorage.configuracaoPaineis);
         }else{
-            this.paineis = {};
+            this.configuracoesPaineis = {};
         }
     }
 
