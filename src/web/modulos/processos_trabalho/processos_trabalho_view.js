@@ -129,6 +129,26 @@ export class ProcessosTrabalhoView extends HTMLElement{
 
 
 
+    tituloFormatadoHTML(processoTrabalho){
+        let titulo;
+        if (processoTrabalho.criadaPeloUsuario !== undefined){
+            titulo = `<span style='background-color:#ADD8E6;'>${processoTrabalho.titulo}</span>`;
+        }else{
+            titulo = processoTrabalho.titulo;
+        }
+
+        if (this.configuracoes.filtro == "procurar"){
+            let indice_inicio = titulo.toLowerCase().indexOf(this.configuracoes.valorProcurado.toLowerCase());
+            if (indice_inicio != -1){
+                let indice_fim = indice_inicio + this.configuracoes.valorProcurado.length;
+                titulo = `${titulo.slice(0, indice_inicio+1)}<strong><em>${titulo.slice(indice_inicio+1, indice_fim)}</em></strong>${titulo.slice(indice_fim)}`;
+            }
+        }
+        return titulo;
+    }
+
+
+
     criarTabelaProcessosTrabalho(){
 
         let container = this._shadowRoot.getElementById("tabelaProcessosTrabalho");
@@ -140,11 +160,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
             layout:"fitColumns",
             columns:[                
                 {title:"Processos de Trabalho", field:"titulo", width:450, formatter:(celula, parametros, onRendered)=>{
-                    if (celula.getData().criadaPeloUsuario !== undefined){
-                        return `<b>${celula.getValue()}</b>`;
-                    }else{
-                        return celula.getValue();
-                    }
+                    return this.tituloFormatadoHTML (celula.getData());
                 }},
                 {title:"Proficiência", field:"nivelProficiencia", width:180, hozAlign:"center", formatter:"star", formatterParams:{stars:5}, editor:true,
                     cellEdited: celula => {

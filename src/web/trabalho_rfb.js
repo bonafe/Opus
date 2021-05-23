@@ -233,11 +233,11 @@ export class TrabalhoRFB{
         let cpf = UsuarioDAO.getInstance().usuario.cpf;
         let agora = new Date();
         let arquivoZIP = `${agora.getFullYear()}_${agora.getMonth()+1}_${agora.getDay()}_${agora.getHours()}_${agora.getMinutes()}-Relatório Opus RFB-${cpf}.zip`;
-        let arquivoAtividades = `${AtividadesDAO.getInstance().idBaseAtividades}.csv`;
+        let arquivoAtividades = `${OpusDAO.getInstance().idBase}_atividades.csv`;
         let conteudoAtividades = AtividadesDAO.getInstance().atividadesCSV();
         zip.file(arquivoAtividades,conteudoAtividades);
 
-        let arquivoProcessosTrabalho = `${ProcessosTrabalhoDAO.getInstance().idBaseProcessosTrabalho}.csv`;
+        let arquivoProcessosTrabalho = `${OpusDAO.getInstance().idBase}_processosTrabalho.csv`;
         let conteudoProcessosTrabalho = ProcessosTrabalhoDAO.getInstance().processosTrabalhoCSV();
         zip.file(arquivoProcessosTrabalho, conteudoProcessosTrabalho);
 

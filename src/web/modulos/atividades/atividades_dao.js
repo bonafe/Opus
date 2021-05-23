@@ -96,6 +96,6 @@ export class AtividadesDAO{
 
 
     atividadeCSV(atividade){
-        return [atividade.competencia.id, atividade.id, atividade.inicio, atividade.fim, atividade.dataCriacao, atividade.conteudo].join(";");
+        return [atividade.competencia.id, atividade.id, new Date(atividade.inicio).toISOString(), new Date(atividade.fim).toISOString(), atividade.dataCriacao, atividade.conteudo].join(";");
     }
 }
