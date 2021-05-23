@@ -15,7 +15,7 @@ export class AtividadesView extends HTMLElement{
             AtividadesView._template = document.createElement("template");
             AtividadesView._template.innerHTML = `
                 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-                <link href="//unpkg.com/vis-timeline@latest/styles/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
+                <link href="/bibliotecas/visjs/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
                 <div class="mx-2">                    
                     <div id="linhaDoTempo" class="container-flex">
                         <div></div>

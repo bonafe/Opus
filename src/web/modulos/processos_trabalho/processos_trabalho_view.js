@@ -149,8 +149,8 @@ export class ProcessosTrabalhoView extends HTMLElement{
                     cellEdited: celula => {
                         console.log(`Nível de Proficiência: ${celula.getValue()}`)
                     },
-                        editable: celula => this.editavel(celula.getRow().getData())
-                    },
+                    editable: celula => this.editavel(celula.getRow().getData())
+                },
                 {title:"Afinidade", field:"nivelAfinidade", width:160, hozAlign:"center", formatter:"star", formatterParams:{stars:5}, editor:true,
                     cellEdited: celula => {
                         console.log(`Nível de Afinidade: ${celula.getValue()}`)
@@ -170,6 +170,12 @@ export class ProcessosTrabalhoView extends HTMLElement{
                     editable: celula => this.editavel(celula.getRow().getData())
                 }
             ],
+            rowClick:function(e, row){
+                console.log ("clicou");
+            },
+            rowMouseEnter:function(e, row){
+                console.log ("mouse enter");
+            },
             rowDblClick: (evento, linha) => {
                 console.log(`Duplo clique na linha: ${linha.getData().titulo}`);
                 let competenciaUsuario = linha.getData();
