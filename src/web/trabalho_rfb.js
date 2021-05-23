@@ -10,9 +10,30 @@ import { CompetenciasView } from "./modulos/processos_trabalho/competencias_view
 import { AtividadesDAO } from "./modulos/atividades/atividades_dao.js";
 import { ProcessosTrabalhoDAO } from "./modulos/processos_trabalho/processos_trabalho_dao.js";
 import { UsuarioDAO } from "./modulos/pessoas/usuario_dao.js";
-
+import { OpusDAO } from './modulos/OpusDAO.js';
 
 export class TrabalhoRFB{
+
+    static CONFIGURACAO_PADRAO = {
+        processosTrabalho:{
+            altura: "395.00px",
+            largura: "496.00px",
+            x: "11.00px",
+            y: "71.00px"
+        },
+        competencias:{
+            altura: "395.00px",
+            largura: "300.00px",
+            x: "520.00px",
+            y: "71.00px"
+        },
+        atividades:{
+            altura: "226.00px",
+            largura: "820.00px",
+            x: "11.00px",
+            y: "488.00px"
+        },
+    };
 
 
     static instancia = undefined;
@@ -30,7 +51,9 @@ export class TrabalhoRFB{
         this.paineis = {};
         this.configuracoesPaineis = {};
 
+        OpusDAO.getInstance().carregar();
         UsuarioDAO.getInstance();
+
         this.iniciarServiceWorkers();
         this.carregarConfiguracaoJanelas();
     }
@@ -48,7 +71,7 @@ export class TrabalhoRFB{
     renderizar(){
 
         this.atividades = document.createElement("atividades-view");
-        this.criarPainel("atividade", "Atividades Realizadas", this.atividades);
+        this.criarPainel("atividades", "Atividades Realizadas", this.atividades);
         this.atividades.renderizar();
     
     
@@ -100,6 +123,7 @@ export class TrabalhoRFB{
         });
 
         this.aplicarConfiguracoes();
+        this.atualizarConfiguracoes();
     }
 
 
@@ -139,13 +163,7 @@ export class TrabalhoRFB{
      aplicarConfiguracoesPainel (painel) {
 
         if (this.configuracoesPaineis[painel.id] === undefined){
-            this.configuracoesPaineis[painel.id] = {
-                altura: Math.min(500, this.innerHeight*0.6),
-                largura: Math.min(800, this.innerWidth*0.9),
-                x: 10,
-                y: 10,
-                z: undefined
-            };
+            this.configuracoesPaineis[painel.id] = TrabalhoRFB.CONFIGURACAO_PADRAO[painel.id];
         }
 
         painel.style.height = this.configuracoesPaineis[painel.id].altura;

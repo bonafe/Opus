@@ -1,6 +1,6 @@
 import { base_processos_trabalho_rfb_02_05_2021 } from './base/2021_05_02_processos_trabalho_rfb.js';
 import { UsuarioDAO } from '../pessoas/usuario_dao.js';
-
+import { OpusDAO } from '../OpusDAO.js';
 
 export class ProcessosTrabalhoDAO{
 
@@ -20,47 +20,40 @@ export class ProcessosTrabalhoDAO{
 
 
     constructor(){
-        this.carregarBase();
     }
 
 
+
+    iniciarBase(){
+
+        console.log (`Inicializando base de dados com a base: base_processos_trabalho_rfb_23_04_2021`);
+
+        this.processosTrabalho = base_processos_trabalho_rfb_02_05_2021.processos_trabalho;
+        this.competencias = base_processos_trabalho_rfb_02_05_2021.competencias;
+    }
 
     carregarBase(){
 
-        let cpf = UsuarioDAO.getInstance().usuario.cpf;
-        this.idBaseProcessosTrabalho = `processosTrabalho_${cpf}`;
-        this.idBaseCompetencias = `competencias_${cpf}`;
-
-        //A primeira vez que roda pega os dados do javascript, depois usa o localStorage para guardas as mudanças
-        if (!localStorage[this.idBaseProcessosTrabalho ]){
-
-            console.log (`Base de dados não encontrada`);
-            console.log (`Inicializando base de dados com a base: base_processos_trabalho_rfb_23_04_2021`);
-
-            this.processosTrabalho = base_processos_trabalho_rfb_02_05_2021.processos_trabalho;
-            this.competencias = base_processos_trabalho_rfb_02_05_2021.competencias;
-
-            console.log (`Salvando a base de dados no armazenamento local do navegador`);
-            localStorage[this.idBaseProcessosTrabalho] = JSON.stringify(this.processosTrabalho);
-            localStorage[this.idBaseCompetencias] = JSON.stringify(this.competencias);
-
-        }else{            
-            
-            //console.log (`Carregando base de dados do armazenamento local`);
-            this.processosTrabalho = JSON.parse(localStorage[this.idBaseProcessosTrabalho]);
-            this.competencias = JSON.parse(localStorage[this.idBaseCompetencias]);
-        }
+        this.processosTrabalho = OpusDAO.getInstance().base["processosTrabalho"];
+        this.competencias = OpusDAO.getInstance().base["competencias"];
     }
 
+
+
+    salvarBase(){
+        OpusDAO.getInstance().base["competencias"] = this.competencias;
+        OpusDAO.getInstance().base["processosTrabalho"] = this.processosTrabalho;
+        OpusDAO.getInstance().salvar();
+    }
 
 
     salvarCompetenciaUsuario(idProcessoTrabalho, competencia){
 
         console.log (`Salvando competencia do usuário na base de dados local do navegador`);
         this.competencias[competencia.id] = competencia;
-        localStorage[this.idBaseCompetencias] = JSON.stringify(this.competencias);
 
-        if (competencia.criadaPeloUsuario){
+
+        if (competencia.criadaPeloUsuario && (idProcessoTrabalho != -1)){
             console.log (`processo id: ${idProcessoTrabalho}`);
             let processoTrabalho = this.procurarProcessoTrabalho (idProcessoTrabalho, Object.values(this.processosTrabalho));
             if (processoTrabalho == null){
@@ -78,10 +71,11 @@ export class ProcessosTrabalhoDAO{
 
                 if (!competenciaEncontrada){
                     processoTrabalho.competencias.push(competencia.id);
-                    localStorage[this.idBaseProcessosTrabalho] = JSON.stringify(this.processosTrabalho);
+
                 }
             }
         }
+        this.salvarBase();
     }
 
     procurarProcessoTrabalho (idProcessoTrabalho, processoTrabalho){

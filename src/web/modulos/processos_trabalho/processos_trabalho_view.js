@@ -70,7 +70,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
             console.log (`Configurações não encontradas na base de dados local`);
             console.log (`Inicializando configuração com valores padrão`);
             this.configuracoes = {
-                filtro: "ativas",
+                filtro: "todos",
                 valorProcurado: ""
             };
             this.salvarConfiguracoes();
@@ -149,25 +149,25 @@ export class ProcessosTrabalhoView extends HTMLElement{
                     cellEdited: celula => {
                         console.log(`Nível de Proficiência: ${celula.getValue()}`)
                     },
-                        editable: celula => (celula.getRow().getData().filhos === undefined)
+                        editable: celula => this.editavel(celula.getRow().getData())
                     },
                 {title:"Afinidade", field:"nivelAfinidade", width:160, hozAlign:"center", formatter:"star", formatterParams:{stars:5}, editor:true,
                     cellEdited: celula => {
                         console.log(`Nível de Afinidade: ${celula.getValue()}`)
                     },
-                    editable: celula => (celula.getRow().getData().filhos === undefined)
+                    editable: celula => this.editavel(celula.getRow().getData())
                 },
                 {title:"Duração", field:"duracaoPadrao", width:145, hozAlign:"center", editor:"input",
-                    ccellEdited: celula => {
+                    cellEdited: celula => {
                         console.log(`Duração Padrão: ${celula.getValue()}`)
                     },
-                    editable: celula => (celula.getRow().getData().filhos === undefined)
+                    editable: celula => this.editavel(celula.getRow().getData())
                 },
                 {title:"Tarefa", field:"ativa", width:120, hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true,
                     cellEdited: celula => {
                         console.log(`Ativa: ${celula.getValue()}`)
                     },
-                    editable: celula => (celula.getRow().getData().filhos === undefined)
+                    editable: celula => this.editavel(celula.getRow().getData())
                 }
             ],
             rowDblClick: (evento, linha) => {
@@ -190,13 +190,8 @@ export class ProcessosTrabalhoView extends HTMLElement{
                     this.dispatchEvent (new CustomEvent(ProcessosTrabalhoView.EVENTO_EDITOU_PROCESSO_TRABALHO_USUARIO, {detail:competenciaUsuario}));
                 }
             },
-            cellEdited: celula => {
-                let processoTrabalho = celula.getRow().getTreeParent().getData();
-                let competenciaUsuario = celula.getRow().getData();
-                ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(processoTrabalho.id, competenciaUsuario);
-                this.dispatchEvent (new CustomEvent(ProcessosTrabalhoView.EVENTO_EDITOU_PROCESSO_TRABALHO_USUARIO, {detail:competenciaUsuario}));
-            },
-             rowContextMenu: (componente, e) => {
+            cellEdited: celula => this.editouProcessoTrabalho(celula.getRow().getTreeParent().getData(), celula.getRow().getData()),
+            rowContextMenu: (componente, e) => {
 
                 let menu = [];
                 let processoTrabalho = componente.getData();
@@ -205,13 +200,12 @@ export class ProcessosTrabalhoView extends HTMLElement{
                     if (!processoTrabalho.criadaPeloUsuario){
                         return false;
                     }else{
-                       menu.push({
-                        label:"Renomear",
-                        action:(e, linha) => {
-                            linha.addTreeChild(
+                        menu.push({
+                            label:"Renomear",
+                            action:(e, linha) => {
                                 this.renomearCompetencia(
                                     linha.getData().id,
-                                    prompt("Digite o novo título da competência")));
+                                    prompt("Digite o novo título da competência"));
                             }
                         });
                     }
@@ -236,6 +230,14 @@ export class ProcessosTrabalhoView extends HTMLElement{
         this.selecionarProcessosTrabalho();
     }
 
+    editavel(processoTrabalho){
+        return processoTrabalho.filhos === undefined;
+    }
+
+    editouProcessoTrabalho(processoTrabalho, competencia){
+        ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(processoTrabalho.id, competencia);
+        this.dispatchEvent (new CustomEvent(ProcessosTrabalhoView.EVENTO_EDITOU_PROCESSO_TRABALHO_USUARIO, {detail:competencia}));
+    }
 
     adicionarCompetencia (processoTrabalho, tituloCompetencia){
 
@@ -256,7 +258,7 @@ export class ProcessosTrabalhoView extends HTMLElement{
             titulo: tituloCompetencia,
             criadaPeloUsuario: true
         };
-        ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(processoTrabalho.id, competencia);
+        ProcessosTrabalhoDAO.getInstance().salvarCompetenciaUsuario(-1, competencia);
         return competencia;
     }
 
