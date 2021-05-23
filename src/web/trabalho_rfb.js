@@ -122,7 +122,7 @@ export class TrabalhoRFB{
             this.atualizarConfiguracoes();
         });
 
-        //this.aplicarConfiguracoes();
+        this.aplicarConfiguracoes();
         this.atualizarConfiguracoes();
     }
 
