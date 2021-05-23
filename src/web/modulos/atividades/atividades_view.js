@@ -166,7 +166,7 @@ export class AtividadesView extends HTMLElement{
             }
         });
 
-        let duracaoPadrao = (competencia.duracaoPadrao === undefined ? AtividadesView.DURACAO_PADRAO : competencia.duracaoPadrao) * 60 * 1000;
+        let duracaoPadrao = this.calcularDuracaoPadrao(competencia);
 
         //Se não existrem items
         if (dataFimItemMaisRecente == 0){
@@ -178,6 +178,14 @@ export class AtividadesView extends HTMLElement{
         this.adicionarAtividade(competencia, centro - duracaoPadrao, centro);
     }
 
+
+    calcularDuracaoPadrao(competencia){
+        let duracao = parseInt(competencia.duracaoPadrao);
+         if (isNaN(duracao)){
+            duracao = AtividadesView.DURACAO_PADRAO;
+         }
+         return duracao * 60 * 1000;
+    }
 
 
     adicionarAtividade (competencia, inicio, fim){

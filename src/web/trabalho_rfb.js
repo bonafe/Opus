@@ -1,7 +1,6 @@
 
 //jsPanel: Janelas flutuantes
 import { jsPanel } from '/bibliotecas/jspanel/jspanel.min.js';
-import { TabulatorProcessosTrabalho } from './modulos/processos_trabalho/tabulator_processos_trabalho.js';
 
 //Módulos locais
 import { ProcessosTrabalhoView } from "./modulos/processos_trabalho/processos_trabalho_view.js";
@@ -71,9 +70,6 @@ export class TrabalhoRFB{
 
     renderizar(){
 
-        this.teste = document.createElement("tabulator-processos-trabalho");
-        this.criarPainel("teste", "teste", this.teste);
-
         this.atividades = document.createElement("atividades-view");
         this.criarPainel("atividades", "Atividades Realizadas", this.atividades);
         this.atividades.renderizar();
@@ -102,7 +98,7 @@ export class TrabalhoRFB{
 
     
         document.addEventListener("jspanelresizestop", evento => {
-            this.atualizarConfiguracoes();
+            this.atualizarConfiguracoes(true);
         });
     
         document.addEventListener("jspanelresize", evento => {
@@ -111,23 +107,23 @@ export class TrabalhoRFB{
         });
 
         document.addEventListener("jspanelmaximized", evento => {
-            this.atualizarConfiguracoes();
+            this.atualizarConfiguracoes(true);
         });
 
         document.addEventListener("jspanelnormalized", evento => {
-            this.atualizarConfiguracoes();
+            this.atualizarConfiguracoes(true);
         });
 
         document.addEventListener("jspaneldragstop", evento => {
-            this.atualizarConfiguracoes();
+            this.atualizarConfiguracoes(true);
         });
 
         document.addEventListener("jspanelfronted", evento => {
-            this.atualizarConfiguracoes();
+            this.atualizarConfiguracoes(false);
         });
 
         this.aplicarConfiguracoes();
-        this.atualizarConfiguracoes();
+        this.atualizarConfiguracoes(true);
     }
 
 
@@ -182,12 +178,14 @@ export class TrabalhoRFB{
 
 
 
-    atualizarConfiguracoes(){
+    atualizarConfiguracoes(redimensionar){
         Object.values(this.paineis).forEach(painel => {
             this.atualizarConfiguracoesPainel (painel);
         });
         this.salvarConfiguracaoJanelas();
-        this.redimensionarConteudoPaineis();
+        if (redimensionar){
+            this.redimensionarConteudoPaineis();
+        }
     }
 
 

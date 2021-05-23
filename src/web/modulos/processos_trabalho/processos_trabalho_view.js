@@ -16,7 +16,8 @@ export class ProcessosTrabalhoView extends HTMLElement{
         if (ProcessosTrabalhoView._template === undefined){
             ProcessosTrabalhoView._template = document.createElement("template");
             ProcessosTrabalhoView._template.innerHTML = `
-                <link href="bibliotecas/tabulator/css/tabulator.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+                <link href="/bibliotecas/tabulator/css/tabulator.min.css" rel="stylesheet">
                 <div class="mx-2">                         
                     <form>
                         <label class="checkbox-inline">
@@ -173,9 +174,6 @@ export class ProcessosTrabalhoView extends HTMLElement{
             rowClick:function(e, row){
                 console.log ("clicou");
             },
-            rowMouseEnter:function(e, row){
-                console.log ("mouse enter");
-            },
             rowDblClick: (evento, linha) => {
                 console.log(`Duplo clique na linha: ${linha.getData().titulo}`);
                 let competenciaUsuario = linha.getData();
@@ -232,7 +230,6 @@ export class ProcessosTrabalhoView extends HTMLElement{
                 return menu;
              }
         });
-
         this.selecionarProcessosTrabalho();
     }
 
