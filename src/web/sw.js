@@ -17,6 +17,7 @@ const arquivosCache = [
 '/modulos/processos_trabalho/competencias_view.js',
 '/modulos/processos_trabalho/processos_trabalho_dao.js',
 '/modulos/processos_trabalho/processos_trabalho_view.js',
+'/modulos/OpusDAO.js',
 '/index.html',
 '/trabalho_rfb.js'
 ];
