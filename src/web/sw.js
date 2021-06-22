@@ -56,11 +56,18 @@ self.addEventListener('activate', event => {
 
 
 self.addEventListener('fetch', event => {
-    console.log (`Service worker: FETCH:${event.request}`);
+    console.log (`Service worker: FETCH:${event.request.url}`);
     event.respondWith(
+        //Procura o recurso primeiro no endereço remoto
         fetch(event.request)
-        .then(resposta => resposta)
-        .catch(() => caches.match(event.request).then(resposta => resposta))
+            .then(resposta => {
+
+                return resposta;
+            })
+        .catch(() => {
+            console.log(`Service worker: FETCH:${event.request.url} --- NÃO ENCONTRADO: puxando do cache local`);
+            return caches.match(event.request).then(resposta => resposta);
+        })
     );
 });
 
